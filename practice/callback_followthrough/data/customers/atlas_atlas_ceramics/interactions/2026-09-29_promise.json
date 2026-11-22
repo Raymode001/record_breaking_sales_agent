@@ -1,0 +1,17 @@
+{
+  "id": "interaction:atlas:promise",
+  "kind": "interaction",
+  "date": "2026-09-29",
+  "data": {
+    "channel": "call",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Please call on campaign day 2. We need CalendarLink scheduling, budget $30. There is no need to call sooner."
+      }
+    ]
+  },
+  "customer_id": "atlas",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead943:current",
+  "customer_id": "lead943",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Casey Duarte",
+    "business": "Cedar Makers Collective",
+    "background": "A small service business considering appointment software. Latest contact: We need reminders for our classes. I also spend a lot of time adding up activity from several venues.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Casey Duarte",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

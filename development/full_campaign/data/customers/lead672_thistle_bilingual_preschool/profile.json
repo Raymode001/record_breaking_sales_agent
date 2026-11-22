@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead672:current",
+  "customer_id": "lead672",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Ravi Menon",
+    "business": "Thistle Bilingual Preschool",
+    "background": "A small service business considering appointment software. Latest contact: Most of our families read Spanish first. English-only reminders would not work for us.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Ravi Menon",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

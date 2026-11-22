@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead582:inquiry",
+  "customer_id": "lead582",
+  "kind": "interaction",
+  "date": "2026-12-05",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "The current request is a reminder subscription. Finance has not yet completed its review of reporting across teaching venues."
+      }
+    ]
+  }
+}

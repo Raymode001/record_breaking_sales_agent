@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead985:follow_up",
+  "customer_id": "lead985",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead985:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Your colleague told us last year that an OtherSuite connector was on its way. Is it ready?"
+      }
+    ]
+  }
+}

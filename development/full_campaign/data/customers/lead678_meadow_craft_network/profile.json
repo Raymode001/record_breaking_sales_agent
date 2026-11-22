@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead678:current",
+  "customer_id": "lead678",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Robin Chen",
+    "business": "Meadow Craft Network",
+    "background": "A small service business considering appointment software. Latest contact: We need both site-level and combined reporting, but the network has a firm spending cap.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Robin Chen",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

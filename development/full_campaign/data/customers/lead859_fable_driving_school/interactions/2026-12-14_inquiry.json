@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead859:inquiry",
+  "customer_id": "lead859",
+  "kind": "interaction",
+  "date": "2026-12-14",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our treasurer wants a reminder system, but is concerned about what happens if we cancel shortly after joining."
+      }
+    ]
+  }
+}

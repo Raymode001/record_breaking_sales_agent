@@ -1,0 +1,17 @@
+{
+  "id": "interaction:quill:question",
+  "kind": "interaction",
+  "date": "2026-09-28",
+  "data": {
+    "channel": "call",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We need CalendarLink scheduling, budget $30. Can we import student contact records and historical reminder delivery logs?"
+      }
+    ]
+  },
+  "customer_id": "quill",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

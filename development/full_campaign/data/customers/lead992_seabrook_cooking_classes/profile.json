@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead992:current",
+  "customer_id": "lead992",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Morgan Silva",
+    "business": "Seabrook Cooking Classes",
+    "background": "A small service business considering appointment software. Latest contact: I handle buying for a group of tutors. We need the exact migration steps and the total account price, not a per-tutor estimate.",
+    "business_info": {
+      "current_software": "BookFlow",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Morgan Silva",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

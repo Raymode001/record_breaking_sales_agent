@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead149:follow_up",
+  "customer_id": "lead149",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead149:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "I have ten minutes. We need reminders working this week."
+      }
+    ]
+  }
+}

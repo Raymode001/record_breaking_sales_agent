@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead676:follow_up",
+  "customer_id": "lead676",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead676:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We have two sites today, but one may close at the end of the month. We decide on day 3."
+      }
+    ]
+  }
+}

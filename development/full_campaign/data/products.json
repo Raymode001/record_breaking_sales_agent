@@ -1,0 +1,43 @@
+[
+  {
+    "id": "basic",
+    "name": "Basic",
+    "monthly_price_cents": 3000,
+    "monthly_service_cost_cents": 1000,
+    "features": [
+      "scheduling"
+    ],
+    "integrations": [
+      "CalendarLink"
+    ]
+  },
+  {
+    "id": "pro",
+    "name": "Pro",
+    "monthly_price_cents": 6000,
+    "monthly_service_cost_cents": 2000,
+    "features": [
+      "scheduling",
+      "reminders"
+    ],
+    "integrations": [
+      "CalendarLink",
+      "BookFlow"
+    ]
+  },
+  {
+    "id": "premium",
+    "name": "Premium",
+    "monthly_price_cents": 10000,
+    "monthly_service_cost_cents": 3500,
+    "features": [
+      "scheduling",
+      "reminders",
+      "location_reporting"
+    ],
+    "integrations": [
+      "CalendarLink",
+      "BookFlow"
+    ]
+  }
+]

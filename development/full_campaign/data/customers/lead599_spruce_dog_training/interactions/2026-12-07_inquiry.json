@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead599:inquiry",
+  "customer_id": "lead599",
+  "kind": "interaction",
+  "date": "2026-12-07",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "OtherSuite is currently our operating system. A live connection would be essential if that software remains in use."
+      }
+    ]
+  }
+}

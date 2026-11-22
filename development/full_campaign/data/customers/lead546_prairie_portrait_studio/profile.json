@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead546:current",
+  "customer_id": "lead546",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Amara Okafor",
+    "business": "Prairie Portrait Studio",
+    "background": "A small service business considering appointment software. Latest contact: A plain booking calendar is all I need, at a price that suits a one-person studio.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Amara Okafor",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

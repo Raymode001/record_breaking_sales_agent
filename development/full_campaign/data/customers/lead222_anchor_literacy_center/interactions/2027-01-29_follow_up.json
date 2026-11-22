@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead222:follow_up",
+  "customer_id": "lead222",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead222:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our current budget is too tight for most reminder products. A funding decision on day 9 may change it."
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead628:follow_up",
+  "customer_id": "lead628",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead628:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Taking a deposit when a client books is the whole point for us."
+      }
+    ]
+  }
+}

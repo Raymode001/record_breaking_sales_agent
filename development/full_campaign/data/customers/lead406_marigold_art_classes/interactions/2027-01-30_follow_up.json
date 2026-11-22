@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead406:follow_up",
+  "customer_id": "lead406",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead406:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "I just need an online calendar my clients can book into."
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "interaction:orion:terms",
+  "kind": "interaction",
+  "date": "2026-09-29",
+  "data": {
+    "channel": "call",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We need BookFlow reminders. Our maximum is $55 monthly. Approval is available on campaign day 3. Please send a formal quote on day 1 so we can review it."
+      }
+    ]
+  },
+  "customer_id": "orion",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

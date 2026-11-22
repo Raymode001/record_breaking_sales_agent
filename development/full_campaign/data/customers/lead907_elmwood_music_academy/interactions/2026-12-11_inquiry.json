@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead907:inquiry",
+  "customer_id": "lead907",
+  "kind": "interaction",
+  "date": "2026-12-11",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our last provider made leaving difficult. Record exports and trial cancellation terms will matter when we next consider a subscription."
+      }
+    ]
+  }
+}

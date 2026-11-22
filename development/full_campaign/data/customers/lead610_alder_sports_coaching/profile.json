@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead610:current",
+  "customer_id": "lead610",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Jordan Lee",
+    "business": "Alder Sports Coaching",
+    "background": "A small service business considering appointment software. Latest contact: A calendar is essential. Reducing the time I spend chasing confirmations could also be worth paying for.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Jordan Lee",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

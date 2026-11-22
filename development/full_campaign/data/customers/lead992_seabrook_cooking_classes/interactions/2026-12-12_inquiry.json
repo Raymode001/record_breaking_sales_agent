@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead992:inquiry",
+  "customer_id": "lead992",
+  "kind": "interaction",
+  "date": "2026-12-12",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Several staff would use the same account. We use BookFlow; I would like an explanation of the migration and account charges."
+      }
+    ]
+  }
+}

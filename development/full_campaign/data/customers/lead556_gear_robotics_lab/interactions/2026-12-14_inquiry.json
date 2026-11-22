@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead556:inquiry",
+  "customer_id": "lead556",
+  "kind": "interaction",
+  "date": "2026-12-14",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We need reminders. Our purchasing calendar only allows purchases at the end of the month."
+      }
+    ]
+  }
+}

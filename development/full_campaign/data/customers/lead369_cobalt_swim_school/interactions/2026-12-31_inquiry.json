@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead369:inquiry",
+  "customer_id": "lead369",
+  "kind": "interaction",
+  "date": "2026-12-31",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We are looking for appointment reminders. Any purchase needs our board's approval."
+      }
+    ]
+  }
+}

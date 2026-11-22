@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead302:current",
+  "customer_id": "lead302",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Ines Duarte",
+    "business": "Harbor Physiotherapy Clinics",
+    "background": "A small service business considering appointment software. Latest contact: We run three clinics. Our compliance lead must approve how the data is stored before we buy anything.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Ines Duarte",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

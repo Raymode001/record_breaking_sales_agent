@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead369:current",
+  "customer_id": "lead369",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Hana Sato",
+    "business": "Cobalt Swim School",
+    "background": "A small service business considering appointment software. Latest contact: Our board votes on day 8. It will only approve a written quote that is still valid that day.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Hana Sato",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

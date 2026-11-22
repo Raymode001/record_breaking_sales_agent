@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead956:current",
+  "customer_id": "lead956",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Taylor Brooks",
+    "business": "Juniper Language Studio",
+    "background": "A small service business considering appointment software. Latest contact: I need a reliable booking calendar, with a price a solo operator can sustain.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Taylor Brooks",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

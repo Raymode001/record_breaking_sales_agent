@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead599:current",
+  "customer_id": "lead599",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Sasha Martin",
+    "business": "Spruce Dog Training",
+    "background": "A small service business considering appointment software. Latest contact: We currently use OtherSuite, but a software replacement decision is due on day 6. Please check the result before treating compatibility as final.",
+    "business_info": {
+      "current_software": "OtherSuite",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Sasha Martin",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

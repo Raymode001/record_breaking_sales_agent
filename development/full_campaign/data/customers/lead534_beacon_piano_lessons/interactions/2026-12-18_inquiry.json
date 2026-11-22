@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead534:inquiry",
+  "customer_id": "lead534",
+  "kind": "interaction",
+  "date": "2026-12-18",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our earlier supplier made it hard to retrieve records when we left. Please send information about your calendar product."
+      }
+    ]
+  }
+}

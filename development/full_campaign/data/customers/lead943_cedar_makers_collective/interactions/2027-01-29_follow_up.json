@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead943:follow_up",
+  "customer_id": "lead943",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead943:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We need reminders for our classes. I also spend a lot of time adding up activity from several venues."
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead676:current",
+  "customer_id": "lead676",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Elena Costa",
+    "business": "Hollow Yoga Studio",
+    "background": "A small service business considering appointment software. Latest contact: We have two sites today, but one may close at the end of the month. We decide on day 3.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Elena Costa",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

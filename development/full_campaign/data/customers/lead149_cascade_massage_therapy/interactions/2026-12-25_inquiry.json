@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead149:inquiry",
+  "customer_id": "lead149",
+  "kind": "interaction",
+  "date": "2026-12-25",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Looking for reminders. We do not have much time for calls."
+      }
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "description": "Public deterministic diagnostics; not a sales prediction benchmark.",
+  "cases": [
+    {
+      "id": "requirements_update",
+      "dataset": "requirements_update/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "requirements_update/customers.json"
+    },
+    {
+      "id": "sourced_answer",
+      "dataset": "sourced_answer/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "sourced_answer/customers.json"
+    },
+    {
+      "id": "issued_quote",
+      "dataset": "issued_quote/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "issued_quote/customers.json"
+    },
+    {
+      "id": "callback_followthrough",
+      "dataset": "callback_followthrough/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "callback_followthrough/customers.json"
+    },
+    {
+      "id": "optout",
+      "dataset": "optout/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "optout/customers.json"
+    }
+  ]
+}

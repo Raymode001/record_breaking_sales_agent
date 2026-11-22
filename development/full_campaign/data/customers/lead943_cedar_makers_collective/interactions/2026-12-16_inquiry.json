@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead943:inquiry",
+  "customer_id": "lead943",
+  "kind": "interaction",
+  "date": "2026-12-16",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We combine figures from our teaching venues in a spreadsheet. I have not yet worked out what an integrated dashboard would be worth."
+      }
+    ]
+  }
+}

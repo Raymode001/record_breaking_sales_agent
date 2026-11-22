@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead428:current",
+  "customer_id": "lead428",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Cameron Ali",
+    "business": "Mosaic Dance School",
+    "background": "A small service business considering appointment software. Latest contact: Missed appointments have become expensive. I want to solve that within a sensible monthly price.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Cameron Ali",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

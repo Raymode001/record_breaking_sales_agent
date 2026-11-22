@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead557:follow_up",
+  "customer_id": "lead557",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead557:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We are budgeting for next term, and nothing can be approved until late this month."
+      }
+    ]
+  }
+}

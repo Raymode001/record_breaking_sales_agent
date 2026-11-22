@@ -1,0 +1,13 @@
+{
+  "id": "profile:nimbus",
+  "kind": "profile",
+  "date": "2026-09-30",
+  "data": {
+    "name": "Mina Park",
+    "business": "Nimbus Music School",
+    "background": "A music school that revised its booking needs after changing software."
+  },
+  "customer_id": "nimbus",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

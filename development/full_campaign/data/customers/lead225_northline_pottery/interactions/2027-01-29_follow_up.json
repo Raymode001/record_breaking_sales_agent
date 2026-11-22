@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead225:follow_up",
+  "customer_id": "lead225",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead225:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We want fewer missed sessions, but first need a clear account of what happens to our BookFlow records."
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead149:current",
+  "customer_id": "lead149",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Freya Lund",
+    "business": "Cascade Massage Therapy",
+    "background": "A small service business considering appointment software. Latest contact: I have ten minutes. We need reminders working this week.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Freya Lund",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

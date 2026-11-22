@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead963:inquiry",
+  "customer_id": "lead963",
+  "kind": "interaction",
+  "date": "2026-12-03",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our work-order system is OtherSuite. It is embedded in daily operations and there is no plan to replace it."
+      }
+    ]
+  }
+}

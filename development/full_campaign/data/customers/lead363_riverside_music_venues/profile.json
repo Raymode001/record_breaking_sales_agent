@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead363:current",
+  "customer_id": "lead363",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Priya Raman",
+    "business": "Riverside Music Venues",
+    "background": "A small service business considering appointment software. Latest contact: Reminders are the must-have. Seeing our two venues side by side would be a bonus.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Priya Raman",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

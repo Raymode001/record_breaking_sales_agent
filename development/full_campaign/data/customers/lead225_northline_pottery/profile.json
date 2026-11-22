@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead225:current",
+  "customer_id": "lead225",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Drew Evans",
+    "business": "Northline Pottery",
+    "background": "A small service business considering appointment software. Latest contact: We want fewer missed sessions, but first need a clear account of what happens to our BookFlow records.",
+    "business_info": {
+      "current_software": "BookFlow",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Drew Evans",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

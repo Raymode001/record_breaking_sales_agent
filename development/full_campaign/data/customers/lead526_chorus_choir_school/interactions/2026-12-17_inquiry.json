@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead526:inquiry",
+  "customer_id": "lead526",
+  "kind": "interaction",
+  "date": "2026-12-17",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We are a volunteer-run club looking for reminders on a very small budget."
+      }
+    ]
+  }
+}

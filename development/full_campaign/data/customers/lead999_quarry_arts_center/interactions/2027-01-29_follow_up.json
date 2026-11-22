@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead999:follow_up",
+  "customer_id": "lead999",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead999:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We previously planned two sites, but the lease review on day 8 may reduce that. Please wait for that review before closing."
+      }
+    ]
+  }
+}

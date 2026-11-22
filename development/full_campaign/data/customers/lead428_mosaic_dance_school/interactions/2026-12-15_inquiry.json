@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead428:inquiry",
+  "customer_id": "lead428",
+  "kind": "interaction",
+  "date": "2026-12-15",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "At the moment I am just shopping for a booking calendar. There have not been many missed appointments yet."
+      }
+    ]
+  }
+}

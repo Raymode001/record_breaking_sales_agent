@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead556:current",
+  "customer_id": "lead556",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Owen Hughes",
+    "business": "Gear Robotics Lab",
+    "background": "A small service business considering appointment software. Latest contact: Our purchasing window opens only on the last day of the month.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Owen Hughes",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

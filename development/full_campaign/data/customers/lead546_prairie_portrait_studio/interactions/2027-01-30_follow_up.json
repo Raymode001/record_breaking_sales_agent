@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead546:follow_up",
+  "customer_id": "lead546",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead546:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "A plain booking calendar is all I need, at a price that suits a one-person studio."
+      }
+    ]
+  }
+}

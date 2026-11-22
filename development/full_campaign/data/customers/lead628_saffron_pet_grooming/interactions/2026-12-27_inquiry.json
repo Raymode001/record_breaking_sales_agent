@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead628:inquiry",
+  "customer_id": "lead628",
+  "kind": "interaction",
+  "date": "2026-12-27",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We want online booking with deposits so that clients stop missing paid sessions."
+      }
+    ]
+  }
+}

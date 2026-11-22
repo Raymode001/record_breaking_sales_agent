@@ -1,0 +1,266 @@
+[
+  {
+    "id": "products:features",
+    "title": "Plan features and account scope",
+    "text": "Basic provides appointment scheduling. Pro provides scheduling and automatic appointment reminders. Premium provides those features plus location_reporting: one dashboard containing both separate site totals and consolidated totals across the account's locations. Pro and Basic do not provide location reporting. All plans are flat monthly prices for the whole account; there are no per-user or per-location charges. Optional add-ons and custom feature combinations are not available.",
+    "available_day": 1
+  },
+  {
+    "id": "integration:compatibility",
+    "title": "Supported integrations",
+    "text": "CalendarLink is supported on Basic, Pro, and Premium. BookFlow is supported on Pro and Premium, but not Basic. These are the complete supported integrations. No plan supports OtherSuite or a connector to it. A CSV import is a one-time data transfer, not a live software integration. Do not promise an unreleased connector.",
+    "available_day": 1
+  },
+  {
+    "id": "migration:bookflow",
+    "title": "BookFlow migration and historical records",
+    "text": "The BookFlow connector synchronizes new appointments after setup. Existing customer records can be imported from a CSV export. Historical reminder delivery logs are not imported. Customers who need those historical logs must keep their own archive separately. Keeping that archive does not prevent using BookFlow synchronization for new appointments. CSV import and BookFlow setup are included in the subscription price.",
+    "available_day": 1
+  },
+  {
+    "id": "terms:billing",
+    "title": "Subscription prices and quote terms",
+    "text": "The quoted monthly price is the total recurring customer charge for the whole account. There are no mandatory setup, onboarding, integration, migration, usage, or tax charges in this simulation. The company pays internal service costs; they are not customer fees. Prices may be discounted within the current pricing policy. A quote fixes its product and price; changing the product requires a new quote. Quote expiration is recorded on each quote.",
+    "available_day": 1
+  },
+  {
+    "id": "terms:trial",
+    "title": "First-month cancellation and refunds",
+    "text": "Every new subscription has a 30-day trial. A cancellation during that trial refunds the full first-month price. The company still pays its internal service cost, and cannot deduct it from the refund. Settlement occurs after the last campaign day.",
+    "available_day": 1
+  },
+  {
+    "id": "sales:discovery",
+    "title": "Working with incomplete customer records",
+    "text": "CRM records contain dated observations, not a complete statement of a customer's current needs. Use conversation to clarify what matters for the proposed purchase. Customers can explain their current workflow, priorities, buying authority, and relevant constraints in ordinary language. A broad relevant question is valid; no special wording is required. Explain how an offer addresses what you learned. Respect a request to stop or a warning that a question has already been answered. Do not infer capabilities from a customer's wish list.",
+    "available_day": 1
+  },
+  {
+    "id": "data:exports",
+    "title": "Exporting account data",
+    "available_day": 1,
+    "text": "Every plan can export customer records and appointment records as CSV. Exports are available during the 30-day trial, including before cancellation. Historical reminder delivery logs are not included in these exports. Exporting does not cancel a subscription; cancellation must be requested separately."
+  },
+  {
+    "id": "products:limits",
+    "title": "Limits of the product",
+    "available_day": 1,
+    "text": "The features and integrations in the product catalogue are complete. No plan has inventory tracking, work-order management, payment processing, or a live OtherSuite integration. A larger plan does not add these capabilities. Sales cannot promise custom development or a future release date."
+  },
+  {
+    "id": "pricing:change-day7",
+    "title": "Price change on campaign day 7",
+    "available_day": 1,
+    "text": "Launch pricing ends after campaign day 6. Quotes first presented on days 1 to 6 follow the launch policy: up to 15% off list price, and a presented quote stays valid for 3 days after the day it is presented. From day 7 the standard policy applies: up to 5% off list price, and a presented quote stays valid for 2 days. A quote presented on or before day 6 keeps its price until it expires, including after day 7. A quote that was created but not presented before day 7 must meet the standard policy when it is first presented. List prices do not change."
+  },
+  {
+    "id": "security:data",
+    "title": "Data hosting, encryption and backups",
+    "available_day": 1,
+    "text": "Customer data is hosted in data centers in the United States. Data is encrypted in transit (TLS 1.2 or later) and at rest (AES-256). Backups run daily and are kept for 30 days. Backups are encrypted like live data. The company does not sell or share customer data. These protections are the same on every plan."
+  },
+  {
+    "id": "security:accounts",
+    "title": "Staff logins and two-factor authentication",
+    "available_day": 1,
+    "text": "Every staff member signs in with their own login. Two-factor authentication by authenticator app is available on every plan and can be required by the account owner. Passwords must be at least 12 characters. Sessions end after 12 hours of inactivity. Single sign-on is not available."
+  },
+  {
+    "id": "support:hours",
+    "title": "Support hours and channels",
+    "available_day": 1,
+    "text": "Email support is available on every plan on weekdays from 8 a.m. to 6 p.m. Eastern time, with a reply within one business day. Phone support is included only with Premium, during the same hours. There is no paid support tier and no support charge on any plan. Outside these hours, the help center remains available."
+  },
+  {
+    "id": "support:onboarding",
+    "title": "Onboarding for new accounts",
+    "available_day": 1,
+    "text": "Every new account gets a one-hour onboarding video call at no extra charge, usually in the first two weeks. The call covers setting up the calendar, importing customer records from CSV, and connecting CalendarLink or BookFlow. Premium accounts with several locations can book one extra free session for each additional location."
+  },
+  {
+    "id": "reminders:languages",
+    "title": "Reminder and booking-page languages",
+    "available_day": 1,
+    "text": "Reminders and the online booking page are available in English, Spanish and French. The language is chosen per client, so each client receives reminders in their own language. Staff screens are in English only. Languages are included at no extra charge wherever the plan includes reminders or the booking page."
+  },
+  {
+    "id": "reminders:channels",
+    "title": "How reminders are delivered",
+    "available_day": 1,
+    "text": "Pro and Premium send automatic reminders by email and by text message (SMS). Text messages are included up to 500 per account per month; after that, reminders continue by email until the next month begins. There is no usage charge. Clients can reply to a text reminder to confirm or cancel. Basic does not send reminders."
+  },
+  {
+    "id": "reminders:timing",
+    "title": "Reminder timing and templates",
+    "available_day": 1,
+    "text": "By default a reminder is sent 24 hours before an appointment. The account can choose any time from 1 to 72 hours before, and can add a second reminder. Templates can include the client's name, the time, the location and a cancellation link. Template changes apply to reminders sent after the change."
+  },
+  {
+    "id": "data:retention",
+    "title": "What happens to records after cancellation",
+    "available_day": 1,
+    "text": "After a subscription is cancelled, the account's records are kept for 60 days and then permanently deleted. During those 60 days the owner can still sign in and export customer and appointment records as CSV (see data:exports). Deleted records cannot be recovered. Historical reminder delivery logs are not exportable."
+  },
+  {
+    "id": "integration:calendarlink",
+    "title": "CalendarLink sync details",
+    "available_day": 1,
+    "text": "The CalendarLink integration is available on Basic, Pro and Premium. It is a two-way sync: appointments booked in either system appear in the other within five minutes. Each staff member connects their own CalendarLink calendar. Setup takes about ten minutes and is covered in the onboarding call."
+  },
+  {
+    "id": "integration:bookflow-setup",
+    "title": "Setting up the BookFlow connector",
+    "available_day": 1,
+    "text": "The BookFlow connector is available on Pro and Premium, not on Basic. An account administrator connects it in about fifteen minutes. After setup, new appointments synchronize automatically. Existing customer records move by a one-time CSV import; historical reminder delivery logs do not move (see migration:bookflow)."
+  },
+  {
+    "id": "integration:othersuite",
+    "title": "OtherSuite",
+    "available_day": 1,
+    "text": "There is no OtherSuite connector on any plan, and none is scheduled. Earlier sales notes that mentioned a planned OtherSuite connector were wrong. A CSV import is a one-time transfer, not a live connection. Sales must not promise an OtherSuite connection or a release date."
+  },
+  {
+    "id": "products:payments",
+    "title": "Payments and deposits",
+    "available_day": 1,
+    "text": "No plan takes card payments, deposits or prepayments. Customers keep their existing payment provider, and the booking page can show a link to it. A payment feature is not on the release plan, and sales cannot promise one."
+  },
+  {
+    "id": "booking:page",
+    "title": "Online booking page",
+    "available_day": 1,
+    "text": "Every plan includes an online booking page with the account's name and logo. Clients choose a service, a staff member and a time; the booking appears in the calendar immediately. The page works on phones and computers."
+  },
+  {
+    "id": "booking:waitlists",
+    "title": "Waitlists and class capacity",
+    "available_day": 1,
+    "text": "Every plan can limit how many clients book a class or group session. There is no waitlist feature: when a class is full, the booking page shows it as full. Sales should not describe a manual workaround as a waitlist."
+  },
+  {
+    "id": "account:plan-changes",
+    "title": "Changing plans",
+    "available_day": 1,
+    "text": "An account can move to a larger or smaller plan at any time. The new monthly price applies from the next monthly renewal, and there is no fee for changing plans. Moving to Basic disconnects BookFlow and stops reminders."
+  },
+  {
+    "id": "account:cancellation",
+    "title": "Cancelling a subscription",
+    "available_day": 1,
+    "text": "The account owner can cancel at any time from the account settings or by email to support. During the 30-day trial, cancellation refunds the full first-month price (see terms:trial). After the trial, cancellation takes effect at the end of the paid month and there is no partial refund."
+  },
+  {
+    "id": "account:users",
+    "title": "Users, roles and locations",
+    "available_day": 1,
+    "text": "Every plan includes unlimited staff users at no extra charge. Roles are owner, manager and staff. On Premium, a manager can be limited to the locations they run, and sees those locations' reports in the dashboard."
+  },
+  {
+    "id": "reporting:dashboard",
+    "title": "The location reporting dashboard",
+    "available_day": 1,
+    "text": "Premium's location reporting dashboard shows bookings, cancellations and no-shows for each location separately and as one consolidated total for the account. Figures update hourly. There is no limit on the number of locations. Pro and Basic do not include the dashboard."
+  },
+  {
+    "id": "reporting:exports",
+    "title": "Exporting reports",
+    "available_day": 1,
+    "text": "Premium can download any dashboard view as a CSV file, for one location or for all locations combined. Customer and appointment records can be exported on every plan (see data:exports)."
+  },
+  {
+    "id": "mobile:apps",
+    "title": "Mobile apps",
+    "available_day": 1,
+    "text": "Staff can use the iOS and Android apps on every plan to see their schedule, book appointments and receive notifications. Clients do not need an app; they book on the web booking page."
+  },
+  {
+    "id": "accessibility:booking",
+    "title": "Accessibility of the booking page",
+    "available_day": 1,
+    "text": "The booking page is designed to meet WCAG 2.1 level AA. It works with screen readers and keyboard navigation, and reminder messages use plain text."
+  },
+  {
+    "id": "privacy:dpa",
+    "title": "Privacy and data processing agreements",
+    "available_day": 1,
+    "text": "A standard data processing agreement is available on request at no cost on every plan. The privacy policy explains which data is collected and why. Customers remain the owners of their client records."
+  },
+  {
+    "id": "status:uptime",
+    "title": "Service status and uptime",
+    "available_day": 1,
+    "text": "The service targets 99.9% monthly uptime. Planned maintenance happens on Sundays between 2 and 4 a.m. Eastern time and is announced three days ahead on the status page. Reminders queued during maintenance are sent after it."
+  },
+  {
+    "id": "support:holidays",
+    "title": "Support holiday schedule",
+    "available_day": 1,
+    "text": "Email and phone support are closed on United States federal holidays. Messages received on a holiday are answered on the next business day. The service itself keeps running."
+  },
+  {
+    "id": "sales:quote-checklist",
+    "title": "Before you send a quote",
+    "available_day": 1,
+    "text": "Confirm the customer's current requirements, essential integration, budget and decision date in the conversation. Quote a plan that meets every requirement, at a price the current policy allows. A presented quote is a written offer with an expiry day. Do not promise features, discounts or terms the documents do not support."
+  },
+  {
+    "id": "release:2026-q4",
+    "title": "Release notes, fourth quarter 2026",
+    "available_day": 1,
+    "text": "CalendarLink sync now runs every five minutes instead of every fifteen. Reminder templates can include a cancellation link. The mobile apps show a daily schedule summary. No changes to plans or prices."
+  },
+  {
+    "id": "release:2027-q1",
+    "title": "Release notes, first quarter 2027",
+    "available_day": 1,
+    "text": "Reminders and the booking page are now available in Spanish and French as well as English, chosen per client. Premium dashboard views can be downloaded as CSV. Two-factor authentication can be required by the owner."
+  },
+  {
+    "id": "case:music-academy",
+    "title": "Customer story: a music academy",
+    "available_day": 1,
+    "text": "A music academy with 300 students moved to Pro to cut missed lessons. Text reminders 24 hours before each lesson reduced no-shows by a third in the first term. Teachers book make-up lessons from the mobile app."
+  },
+  {
+    "id": "case:clinic-group",
+    "title": "Customer story: a three-site clinic group",
+    "available_day": 1,
+    "text": "A physiotherapy group with three clinics chose Premium for its location dashboard. Each clinic manager sees their own site, and the owner sees the combined totals. Onboarding took one call per site."
+  },
+  {
+    "id": "partners:referrals",
+    "title": "Referral program",
+    "available_day": 1,
+    "text": "Existing customers who refer a new account receive a thank-you gift card after the new account's trial ends. Referrals do not change the new account's price or the discount the sales team may offer."
+  },
+  {
+    "id": "glossary",
+    "title": "Glossary",
+    "available_day": 1,
+    "text": "Account: one subscription for a business, whatever its number of staff or sites. Location or site: a place where appointments happen. Quote: a written offer for one plan at one monthly price, with an expiry day. Trial: the first 30 days of a new subscription."
+  },
+  {
+    "id": "faq:general",
+    "title": "Frequently asked questions",
+    "available_day": 1,
+    "text": "Is there a contract? No; plans renew monthly. Is there a setup fee? No. Can we have more staff users? Yes, unlimited on every plan. Can we try it first? Every new subscription starts with a 30-day trial. Do you offer annual billing? No, only monthly billing."
+  },
+  {
+    "id": "archive:trial-2025",
+    "title": "Trial and refunds (2025 terms)",
+    "available_day": 1,
+    "text": "ARCHIVED: replaced on 2026-09-01 by terms:trial; do not quote these terms. Under the 2025 terms, new subscriptions had a 14-day trial, and a refund during the trial was reduced by a $25 setup fee."
+  },
+  {
+    "id": "archive:bookflow-2025",
+    "title": "BookFlow migration guide (2025)",
+    "available_day": 1,
+    "text": "ARCHIVED: replaced by migration:bookflow; do not quote this guide. The 2025 importer copied historical reminder delivery logs on request for a one-time $40 migration fee. That importer was retired; the current connector does neither."
+  },
+  {
+    "id": "archive:autumn-promo-2026",
+    "title": "Autumn 2026 promotion",
+    "available_day": 1,
+    "text": "EXPIRED on 2026-12-31; do not offer it. New Premium accounts received 30% off their first three months. The offer cannot be combined with current pricing."
+  }
+]

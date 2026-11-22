@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead672:inquiry",
+  "customer_id": "lead672",
+  "kind": "interaction",
+  "date": "2026-12-22",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We serve many Spanish-speaking families and need appointment reminders."
+      }
+    ]
+  }
+}

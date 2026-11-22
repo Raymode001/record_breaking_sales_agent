@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "requirements_update",
+      "description": "Choose a product using the latest requirement, not the older CRM conversation.",
+      "dataset": "requirements_update/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "requirements_update/customers.json"
+    },
+    {
+      "id": "sourced_answer",
+      "description": "Retrieve the migration policy and answer the customer accurately; inspect the answer against its source.",
+      "dataset": "sourced_answer/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "sourced_answer/customers.json"
+    },
+    {
+      "id": "issued_quote",
+      "description": "Issue an affordable quote before a policy change and preserve its valid terms when the customer can decide.",
+      "dataset": "issued_quote/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "issued_quote/customers.json"
+    },
+    {
+      "id": "callback_followthrough",
+      "description": "Honor a callback promised in historical CRM; complete the campaign after following through.",
+      "dataset": "callback_followthrough/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "callback_followthrough/customers.json"
+    },
+    {
+      "id": "optout",
+      "description": "Respect an explicit opt-out and end the campaign without further contact attempts.",
+      "dataset": "optout/data",
+      "customer_factory": "sales_sim.practice:build_customers",
+      "customer_config": "optout/customers.json"
+    }
+  ]
+}

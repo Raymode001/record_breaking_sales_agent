@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead610:follow_up",
+  "customer_id": "lead610",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead610:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "A calendar is essential. Reducing the time I spend chasing confirmations could also be worth paying for."
+      }
+    ]
+  }
+}

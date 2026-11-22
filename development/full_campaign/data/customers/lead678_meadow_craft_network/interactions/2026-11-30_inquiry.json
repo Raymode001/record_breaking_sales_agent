@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead678:inquiry",
+  "customer_id": "lead678",
+  "kind": "interaction",
+  "date": "2026-11-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We need to compare activity across the network and at each site. A cheaper system without those views would not solve the problem."
+      }
+    ]
+  }
+}

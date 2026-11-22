@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead907:follow_up",
+  "customer_id": "lead907",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead907:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We had a bad experience leaving a subscription. Explain how we can export our records and what cancellation during the trial refunds."
+      }
+    ]
+  }
+}

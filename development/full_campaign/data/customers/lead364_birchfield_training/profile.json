@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead364:current",
+  "customer_id": "lead364",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Quinn Bell",
+    "business": "Birchfield Training",
+    "background": "A small service business considering appointment software. Latest contact: Our location planning meeting is on day 8. Before that, any scope is provisional.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Quinn Bell",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

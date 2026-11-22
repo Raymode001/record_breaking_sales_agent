@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead985:current",
+  "customer_id": "lead985",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Diego Alvarez",
+    "business": "Ember Climbing Gym",
+    "background": "A small service business considering appointment software. Latest contact: Your colleague told us last year that an OtherSuite connector was on its way. Is it ready?",
+    "business_info": {
+      "current_software": "OtherSuite",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Diego Alvarez",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

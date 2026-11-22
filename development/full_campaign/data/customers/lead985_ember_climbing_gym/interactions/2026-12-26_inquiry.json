@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead985:inquiry",
+  "customer_id": "lead985",
+  "kind": "interaction",
+  "date": "2026-12-26",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Your representative told us in 2025 that an OtherSuite connector would be ready in 2026. We run everything on OtherSuite."
+      }
+    ]
+  }
+}

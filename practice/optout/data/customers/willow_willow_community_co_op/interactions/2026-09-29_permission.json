@@ -1,0 +1,17 @@
+{
+  "id": "interaction:willow:permission",
+  "kind": "interaction",
+  "date": "2026-09-29",
+  "data": {
+    "channel": "call",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "You may check back once next month; we are still deciding whether we need software."
+      }
+    ]
+  },
+  "customer_id": "willow",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

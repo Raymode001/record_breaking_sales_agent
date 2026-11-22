@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "description": "The formal campaign: 40 customers over 12 days, 60 contact minutes a day. Current needs must be discovered in conversation. Keep these data and customer settings fixed for the comparison.",
+  "cases": [
+    {
+      "id": "full_campaign",
+      "dataset": "data",
+      "customer_factory": "sales_sim.discovery_customers:build_customers",
+      "customer_config": "customers.json"
+    }
+  ]
+}

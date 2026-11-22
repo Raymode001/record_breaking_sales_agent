@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead225:inquiry",
+  "customer_id": "lead225",
+  "kind": "interaction",
+  "date": "2026-12-13",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We use BookFlow and retain records from previous years. Before switching we need to establish what can be moved and what must be kept separately."
+      }
+    ]
+  }
+}

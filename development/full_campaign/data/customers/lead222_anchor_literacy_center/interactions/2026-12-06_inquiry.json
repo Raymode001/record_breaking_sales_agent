@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead222:inquiry",
+  "customer_id": "lead222",
+  "kind": "interaction",
+  "date": "2026-12-06",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our current grant allows $48 per month. Reminders are essential; we have also applied for additional funding."
+      }
+    ]
+  }
+}

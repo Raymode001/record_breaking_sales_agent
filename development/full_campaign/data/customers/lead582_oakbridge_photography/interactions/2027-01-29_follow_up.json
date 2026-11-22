@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead582:follow_up",
+  "customer_id": "lead582",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead582:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "The annual reporting review on day 9 will decide whether we need a shared reporting dashboard. I cannot commit before that."
+      }
+    ]
+  }
+}

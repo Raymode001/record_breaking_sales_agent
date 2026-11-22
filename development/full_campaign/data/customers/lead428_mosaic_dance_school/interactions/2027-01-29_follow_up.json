@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead428:follow_up",
+  "customer_id": "lead428",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead428:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Missed appointments have become expensive. I want to solve that within a sensible monthly price."
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "profile:willow",
+  "kind": "profile",
+  "date": "2026-09-30",
+  "data": {
+    "name": "Noor Shah",
+    "business": "Willow Community Co-op",
+    "background": "A community co-op that previously agreed to one follow-up."
+  },
+  "customer_id": "willow",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead532:inquiry",
+  "customer_id": "lead532",
+  "kind": "interaction",
+  "date": "2027-01-01",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We use BookFlow and would want reminders. Our last software switch went badly because nobody helped us set it up."
+      }
+    ]
+  }
+}

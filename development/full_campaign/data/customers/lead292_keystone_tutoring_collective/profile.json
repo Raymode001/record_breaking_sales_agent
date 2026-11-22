@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead292:current",
+  "customer_id": "lead292",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Mateo Ruiz",
+    "business": "Keystone Tutoring Collective",
+    "background": "A small service business considering appointment software. Latest contact: Last time we cancelled software, our records vanished. I need to know what happens to them.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Mateo Ruiz",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

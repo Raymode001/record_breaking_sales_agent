@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead364:follow_up",
+  "customer_id": "lead364",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead364:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our location planning meeting is on day 8. Before that, any scope is provisional."
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead162:inquiry",
+  "customer_id": "lead162",
+  "kind": "interaction",
+  "date": "2026-12-02",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We rent equipment as well as taking appointment bookings. Please let us know which parts of that workflow your product supports."
+      }
+    ]
+  }
+}

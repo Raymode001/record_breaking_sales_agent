@@ -1,0 +1,8 @@
+[
+  {
+    "id": "migration:contacts",
+    "title": "Importing contacts and history",
+    "text": "Customer contact records can be imported from CSV. Historical reminder delivery logs cannot be imported. This limit applies to Basic and Pro.",
+    "available_day": 1
+  }
+]

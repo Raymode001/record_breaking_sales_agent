@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead593:current",
+  "customer_id": "lead593",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Samir Aziz",
+    "business": "Orchid Barber Shop",
+    "background": "A small service business considering appointment software. Latest contact: We started with a simple calendar. A staff meeting on day 4 decides whether we also want reminders.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Samir Aziz",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

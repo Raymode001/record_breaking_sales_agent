@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead610:inquiry",
+  "customer_id": "lead610",
+  "kind": "interaction",
+  "date": "2026-12-17",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We manually confirm appointments today. A calendar is the immediate need, but I would consider paying for something that saves administrative work."
+      }
+    ]
+  }
+}

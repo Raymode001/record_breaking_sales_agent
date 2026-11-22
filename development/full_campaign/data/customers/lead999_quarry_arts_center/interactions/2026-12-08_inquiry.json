@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead999:inquiry",
+  "customer_id": "lead999",
+  "kind": "interaction",
+  "date": "2026-12-08",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We plan to run two sites and will want to compare their activity. The second site's lease has not yet been renewed."
+      }
+    ]
+  }
+}

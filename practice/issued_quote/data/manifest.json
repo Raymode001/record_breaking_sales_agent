@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "start_date": "2026-10-01",
+  "config": {
+    "days": 3,
+    "contact_minutes_per_day": 120,
+    "minutes_per_exchange": 5,
+    "cost_per_exchange_cents": 50
+  }
+}

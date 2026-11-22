@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead117:inquiry",
+  "customer_id": "lead117",
+  "kind": "interaction",
+  "date": "2026-12-10",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We currently operate one venue and only need scheduling with reminders. Additional venues are under discussion for next term."
+      }
+    ]
+  }
+}

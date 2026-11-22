@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead440:current",
+  "customer_id": "lead440",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Devon James",
+    "business": "Solstice Sailing School",
+    "background": "A small service business considering appointment software. Latest contact: Our scheduling vendor will be selected on day 10. A cheap provisional calendar quote may not have the right connector afterwards.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Devon James",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

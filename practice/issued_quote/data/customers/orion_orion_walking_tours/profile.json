@@ -1,0 +1,13 @@
+{
+  "id": "profile:orion",
+  "kind": "profile",
+  "date": "2026-09-30",
+  "data": {
+    "name": "Dana Wells",
+    "business": "Orion Walking Tours",
+    "background": "A tour company that can approve a purchase on day 3."
+  },
+  "customer_id": "orion",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

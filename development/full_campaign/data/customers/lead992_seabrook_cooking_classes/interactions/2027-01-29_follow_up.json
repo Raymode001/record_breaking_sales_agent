@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead992:follow_up",
+  "customer_id": "lead992",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead992:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "I handle buying for a group of tutors. We need the exact migration steps and the total account price, not a per-tutor estimate."
+      }
+    ]
+  }
+}

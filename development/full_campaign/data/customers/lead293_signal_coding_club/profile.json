@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead293:current",
+  "customer_id": "lead293",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Yara Nasser",
+    "business": "Signal Coding Club",
+    "background": "A small service business considering appointment software. Latest contact: We will move off our old booking setup next month, once our current contract ends.",
+    "business_info": {
+      "current_software": "BookFlow",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Yara Nasser",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

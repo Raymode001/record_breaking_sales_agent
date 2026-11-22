@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead363:follow_up",
+  "customer_id": "lead363",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead363:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Reminders are the must-have. Seeing our two venues side by side would be a bonus."
+      }
+    ]
+  }
+}

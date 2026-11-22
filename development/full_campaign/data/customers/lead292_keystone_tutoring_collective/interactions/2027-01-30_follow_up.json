@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead292:follow_up",
+  "customer_id": "lead292",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead292:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Last time we cancelled software, our records vanished. I need to know what happens to them."
+      }
+    ]
+  }
+}

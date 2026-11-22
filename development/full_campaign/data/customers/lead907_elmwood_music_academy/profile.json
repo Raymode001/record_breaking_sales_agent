@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead907:current",
+  "customer_id": "lead907",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Avery Reed",
+    "business": "Elmwood Music Academy",
+    "background": "A small service business considering appointment software. Latest contact: We had a bad experience leaving a subscription. Explain how we can export our records and what cancellation during the trial refunds.",
+    "business_info": {
+      "current_software": "BookFlow",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Avery Reed",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

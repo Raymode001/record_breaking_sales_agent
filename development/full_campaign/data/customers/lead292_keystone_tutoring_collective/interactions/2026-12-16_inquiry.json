@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead292:inquiry",
+  "customer_id": "lead292",
+  "kind": "interaction",
+  "date": "2026-12-16",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We cancelled a scheduling product last year and lost our records. We want reminders, but carefully this time."
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead859:follow_up",
+  "customer_id": "lead859",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead859:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our treasurer approves the purchase later this week. I need to understand the trial refund before recommending it."
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead117:current",
+  "customer_id": "lead117",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Jesse Kim",
+    "business": "Vista Craft Studios",
+    "background": "A small service business considering appointment software. Latest contact: We need one view across our locations, but each manager must also see their own site's totals.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Jesse Kim",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

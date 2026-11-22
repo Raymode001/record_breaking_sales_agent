@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead963:follow_up",
+  "customer_id": "lead963",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead963:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our work-order software will not change. Please establish compatibility before discussing price."
+      }
+    ]
+  }
+}

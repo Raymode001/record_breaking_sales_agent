@@ -1,0 +1,14 @@
+[
+  {
+    "id": "migration:contacts",
+    "title": "Importing contacts and history",
+    "text": "Customer contact records can be imported from CSV. Historical reminder delivery logs cannot be imported. This limit applies to Basic and Pro.",
+    "available_day": 1
+  },
+  {
+    "id": "notice:pricing",
+    "title": "Pricing change announced",
+    "text": "On day 2 the maximum discount falls from 15% to 5%. Issued, unexpired quotes retain their original price. An unpresented draft does not reserve a price.",
+    "available_day": 1
+  }
+]

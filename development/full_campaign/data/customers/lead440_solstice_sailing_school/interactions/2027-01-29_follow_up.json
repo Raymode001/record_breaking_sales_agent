@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead440:follow_up",
+  "customer_id": "lead440",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead440:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our scheduling vendor will be selected on day 10. A cheap provisional calendar quote may not have the right connector afterwards."
+      }
+    ]
+  }
+}

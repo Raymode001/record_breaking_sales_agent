@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead702:follow_up",
+  "customer_id": "lead702",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead702:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We are planning next year's systems. Nothing will be signed before the end of the month."
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead956:follow_up",
+  "customer_id": "lead956",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead956:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "I need a reliable booking calendar, with a price a solo operator can sustain."
+      }
+    ]
+  }
+}

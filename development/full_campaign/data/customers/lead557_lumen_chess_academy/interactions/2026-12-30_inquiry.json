@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead557:inquiry",
+  "customer_id": "lead557",
+  "kind": "interaction",
+  "date": "2026-12-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We may want reminders next term. Our budget for software is small and set once a year."
+      }
+    ]
+  }
+}

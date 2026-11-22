@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead117:follow_up",
+  "customer_id": "lead117",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead117:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We need one view across our locations, but each manager must also see their own site's totals."
+      }
+    ]
+  }
+}

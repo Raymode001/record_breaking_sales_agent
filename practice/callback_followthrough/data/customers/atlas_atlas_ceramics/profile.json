@@ -1,0 +1,13 @@
+{
+  "id": "profile:atlas",
+  "kind": "profile",
+  "date": "2026-09-30",
+  "data": {
+    "name": "Ira Morgan",
+    "business": "Atlas Ceramics",
+    "background": "A pottery studio with an existing callback commitment."
+  },
+  "customer_id": "atlas",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

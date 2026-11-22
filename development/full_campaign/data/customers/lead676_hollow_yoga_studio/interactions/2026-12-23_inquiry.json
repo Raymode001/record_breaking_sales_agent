@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead676:inquiry",
+  "customer_id": "lead676",
+  "kind": "interaction",
+  "date": "2026-12-23",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We operate two sites and want reports for both of them."
+      }
+    ]
+  }
+}

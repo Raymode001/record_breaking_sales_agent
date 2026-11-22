@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead963:current",
+  "customer_id": "lead963",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Ellis Cooper",
+    "business": "Copper Bicycle Service",
+    "background": "A small service business considering appointment software. Latest contact: Our work-order software will not change. Please establish compatibility before discussing price.",
+    "business_info": {
+      "current_software": "OtherSuite",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Ellis Cooper",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

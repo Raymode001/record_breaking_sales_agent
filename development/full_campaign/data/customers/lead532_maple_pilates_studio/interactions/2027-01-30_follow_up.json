@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead532:follow_up",
+  "customer_id": "lead532",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead532:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We will only switch systems if someone actually helps us get started."
+      }
+    ]
+  }
+}

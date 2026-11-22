@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead556:follow_up",
+  "customer_id": "lead556",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead556:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our purchasing window opens only on the last day of the month."
+      }
+    ]
+  }
+}

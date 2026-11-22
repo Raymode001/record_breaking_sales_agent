@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead127:current",
+  "customer_id": "lead127",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Theo Novak",
+    "business": "Kestrel Wellness Centers",
+    "background": "A small service business considering appointment software. Latest contact: Our finance committee meets on day 9. It will only consider written quotes that are still valid then.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Theo Novak",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

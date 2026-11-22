@@ -1,0 +1,20 @@
+{
+  "model": "gpt-5.4-mini",
+  "reasoning_effort": "low",
+  "service_tier": "priority",
+  "customer_model": "gpt-6-luna",
+  "judge_model": "gpt-6-sol",
+  "judge_reasoning_effort": "low",
+  "limits": {
+    "max_steps": 2000,
+    "max_api_calls": 3000,
+    "max_output_tokens": 32768,
+    "max_token_units": 50000000
+  },
+  "prices_usd_per_million_tokens": {
+    "gpt-5.4-mini": {"input": 0.75, "cached_input": 0.075, "output": 4.5},
+    "gpt-6-luna": {"input": 0.1, "cached_input": 0.01, "output": 0.5},
+    "gpt-6-sol": {"input": 2.0, "cached_input": 0.2, "output": 10.0}
+  },
+  "prices_checked": "2026-10-26"
+}

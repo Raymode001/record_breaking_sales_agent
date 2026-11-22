@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead431:current",
+  "customer_id": "lead431",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Clara Weiss",
+    "business": "Larkspur Counseling Practice",
+    "background": "A small service business considering appointment software. Latest contact: We hold sensitive client details, so data security comes before features.",
+    "business_info": {
+      "current_software": "BookFlow",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Clara Weiss",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

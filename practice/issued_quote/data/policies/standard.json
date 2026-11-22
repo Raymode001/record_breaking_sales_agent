@@ -1,0 +1,6 @@
+{
+  "id": "standard",
+  "effective_day": 2,
+  "max_discount_percent": 5,
+  "quote_valid_days": 3
+}

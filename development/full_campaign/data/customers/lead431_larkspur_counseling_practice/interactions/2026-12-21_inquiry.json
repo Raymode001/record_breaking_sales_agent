@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead431:inquiry",
+  "customer_id": "lead431",
+  "kind": "interaction",
+  "date": "2026-12-21",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We use BookFlow. We keep sensitive client information, so security reviews come first."
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead363:inquiry",
+  "customer_id": "lead363",
+  "kind": "interaction",
+  "date": "2026-12-15",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We need appointment reminders. We also run two venues and keep their figures in spreadsheets."
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead534:follow_up",
+  "customer_id": "lead534",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead534:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "I want to try a calendar without getting locked out of my records if I leave."
+      }
+    ]
+  }
+}

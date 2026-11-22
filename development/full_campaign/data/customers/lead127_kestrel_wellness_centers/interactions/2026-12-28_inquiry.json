@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead127:inquiry",
+  "customer_id": "lead127",
+  "kind": "interaction",
+  "date": "2026-12-28",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We have two sites and want to compare them. Our finance committee approves purchases."
+      }
+    ]
+  }
+}

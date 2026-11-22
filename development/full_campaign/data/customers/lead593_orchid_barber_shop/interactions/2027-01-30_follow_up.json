@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead593:follow_up",
+  "customer_id": "lead593",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead593:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We started with a simple calendar. A staff meeting on day 4 decides whether we also want reminders."
+      }
+    ]
+  }
+}

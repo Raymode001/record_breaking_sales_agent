@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead369:follow_up",
+  "customer_id": "lead369",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead369:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our board votes on day 8. It will only approve a written quote that is still valid that day."
+      }
+    ]
+  }
+}

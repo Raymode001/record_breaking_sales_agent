@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead406:current",
+  "customer_id": "lead406",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Noor Haddad",
+    "business": "Marigold Art Classes",
+    "background": "A small service business considering appointment software. Latest contact: I just need an online calendar my clients can book into.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Noor Haddad",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

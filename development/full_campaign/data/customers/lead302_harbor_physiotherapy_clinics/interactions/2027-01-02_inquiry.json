@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead302:inquiry",
+  "customer_id": "lead302",
+  "kind": "interaction",
+  "date": "2027-01-02",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We run three clinics and are collecting security questionnaires from scheduling vendors."
+      }
+    ]
+  }
+}

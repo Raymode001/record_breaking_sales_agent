@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead546:inquiry",
+  "customer_id": "lead546",
+  "kind": "interaction",
+  "date": "2026-12-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "I run a one-person studio and only need clients to book themselves into my calendar."
+      }
+    ]
+  }
+}

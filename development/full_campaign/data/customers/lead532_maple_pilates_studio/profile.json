@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead532:current",
+  "customer_id": "lead532",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Kofi Mensah",
+    "business": "Maple Pilates Studio",
+    "background": "A small service business considering appointment software. Latest contact: We will only switch systems if someone actually helps us get started.",
+    "business_info": {
+      "current_software": "BookFlow",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Kofi Mensah",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

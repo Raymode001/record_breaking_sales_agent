@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead702:current",
+  "customer_id": "lead702",
+  "kind": "profile",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Tomas Berg",
+    "business": "Driftwood Dance Studios",
+    "background": "A small service business considering appointment software. Latest contact: We are planning next year's systems. Nothing will be signed before the end of the month.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Tomas Berg",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

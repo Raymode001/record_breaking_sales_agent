@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead293:inquiry",
+  "customer_id": "lead293",
+  "kind": "interaction",
+  "date": "2026-12-19",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We are on BookFlow and plan to change our booking setup when our current contract ends."
+      }
+    ]
+  }
+}

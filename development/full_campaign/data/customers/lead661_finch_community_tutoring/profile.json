@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead661:current",
+  "customer_id": "lead661",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Sam Rivera",
+    "business": "Finch Community Tutoring",
+    "background": "A small service business considering appointment software. Latest contact: Our grant sets a hard monthly cap and missed sessions mean reminders are non-negotiable.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Sam Rivera",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

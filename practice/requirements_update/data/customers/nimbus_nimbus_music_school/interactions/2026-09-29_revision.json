@@ -1,0 +1,17 @@
+{
+  "id": "interaction:nimbus:revision",
+  "kind": "interaction",
+  "date": "2026-09-29",
+  "data": {
+    "channel": "call",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our earlier requirements are obsolete. We moved to BookFlow and need automated reminders. We can spend $60 per month."
+      }
+    ]
+  },
+  "customer_id": "nimbus",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

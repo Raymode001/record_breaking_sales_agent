@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead956:inquiry",
+  "customer_id": "lead956",
+  "kind": "interaction",
+  "date": "2026-12-19",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "I run this business on my own and am comparing simple calendar subscriptions. I already use CalendarLink."
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "profile:lead162:current",
+  "customer_id": "lead162",
+  "kind": "profile",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "name": "Alex Morgan",
+    "business": "Atlas Equipment Rentals",
+    "background": "A small service business considering appointment software. Latest contact: We rent equipment alongside appointments. The inventory function is the part I need to verify first.",
+    "business_info": {
+      "current_software": "CalendarLink",
+      "record_status": "Current purchase requirements have not been fully qualified."
+    },
+    "contacts": [
+      {
+        "name": "Alex Morgan",
+        "role": "Owner or purchasing lead"
+      }
+    ],
+    "current_subscriptions": []
+  }
+}

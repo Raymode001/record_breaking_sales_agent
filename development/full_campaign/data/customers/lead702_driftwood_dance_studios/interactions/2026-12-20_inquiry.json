@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead702:inquiry",
+  "customer_id": "lead702",
+  "kind": "interaction",
+  "date": "2026-12-20",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We run four studios and want to compare them. Systems decisions are made at the end of the month."
+      }
+    ]
+  }
+}

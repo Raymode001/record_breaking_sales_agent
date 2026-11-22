@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead431:follow_up",
+  "customer_id": "lead431",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead431:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We hold sensitive client details, so data security comes before features."
+      }
+    ]
+  }
+}

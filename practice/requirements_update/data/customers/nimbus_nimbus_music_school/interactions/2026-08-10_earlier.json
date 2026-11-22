@@ -1,0 +1,17 @@
+{
+  "id": "interaction:nimbus:earlier",
+  "kind": "interaction",
+  "date": "2026-08-10",
+  "data": {
+    "channel": "call",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We use CalendarLink and only need scheduling. Our budget is $30."
+      }
+    ]
+  },
+  "customer_id": "nimbus",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}

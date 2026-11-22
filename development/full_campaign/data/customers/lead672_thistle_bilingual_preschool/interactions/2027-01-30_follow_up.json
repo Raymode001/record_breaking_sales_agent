@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead672:follow_up",
+  "customer_id": "lead672",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead672:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Most of our families read Spanish first. English-only reminders would not work for us."
+      }
+    ]
+  }
+}

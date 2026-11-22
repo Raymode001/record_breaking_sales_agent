@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead661:follow_up",
+  "customer_id": "lead661",
+  "kind": "interaction",
+  "date": "2027-01-29",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead661:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "Our grant sets a hard monthly cap and missed sessions mean reminders are non-negotiable."
+      }
+    ]
+  }
+}

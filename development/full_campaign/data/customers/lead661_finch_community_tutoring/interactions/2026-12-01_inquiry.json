@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead661:inquiry",
+  "customer_id": "lead661",
+  "kind": "interaction",
+  "date": "2026-12-01",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We are a grant-funded learning service seeking appointment reminders. Our next discussion must establish whether a plan fits the fixed allowance."
+      }
+    ]
+  }
+}

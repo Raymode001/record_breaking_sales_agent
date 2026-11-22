@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead302:follow_up",
+  "customer_id": "lead302",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead302:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We run three clinics. Our compliance lead must approve how the data is stored before we buy anything."
+      }
+    ]
+  }
+}

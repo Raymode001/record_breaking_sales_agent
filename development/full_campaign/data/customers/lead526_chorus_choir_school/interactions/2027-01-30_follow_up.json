@@ -1,0 +1,19 @@
+{
+  "id": "interaction:lead526:follow_up",
+  "customer_id": "lead526",
+  "kind": "interaction",
+  "date": "2027-01-30",
+  "source": "Synthetic company CRM",
+  "source_ids": [
+    "interaction:lead526:inquiry"
+  ],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We can spend about $35 a month, and reminders are a must."
+      }
+    ]
+  }
+}

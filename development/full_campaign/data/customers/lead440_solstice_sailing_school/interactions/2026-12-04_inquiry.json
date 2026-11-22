@@ -1,0 +1,17 @@
+{
+  "id": "interaction:lead440:inquiry",
+  "customer_id": "lead440",
+  "kind": "interaction",
+  "date": "2026-12-04",
+  "source": "Synthetic company CRM",
+  "source_ids": [],
+  "data": {
+    "channel": "email",
+    "messages": [
+      {
+        "role": "customer",
+        "text": "We are using CalendarLink and comparing simple scheduling products. A separate supplier review may change the software we have to connect."
+      }
+    ]
+  }
+}

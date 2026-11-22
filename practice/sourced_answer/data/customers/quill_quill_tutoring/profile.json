@@ -1,0 +1,13 @@
+{
+  "id": "profile:quill",
+  "kind": "profile",
+  "date": "2026-09-30",
+  "data": {
+    "name": "Leo Ortiz",
+    "business": "Quill Tutoring",
+    "background": "A tutoring business assessing data migration before buying."
+  },
+  "customer_id": "quill",
+  "source": "Synthetic public practice CRM",
+  "source_ids": []
+}
