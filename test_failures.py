@@ -2,15 +2,17 @@
 
 Each test names the account and day it comes from. They describe the behaviour tools.py
 should have, so a test that fails marks a fix still to make. Everything here is free:
-the logic tests drive tools._assess / tools._build_queue / tools.day_check through an
+the logic tests drive tools._assess / tools._build_queue / tools.check_time through an
 in-memory FakeCtx, and the environment tests use try_tools on the scripted practice cases.
 
 Failure map:
   F1 due callbacks pushed behind other offers           -> QueuePriority
-  F2 day ended with minutes and work left (day_check)   -> DayCheck
+  F2 day ended with minutes and work left (check_time)  -> DayCheck
   F3 first contacts too late, lost to the day-7 cut     -> FirstContacts
   F4 contact before the decision day / decision offer   -> DecisionDay
   F5 repeated offers to a customer below the floor      -> BudgetBlocked
+  second-round order: callback, last lock, profit       -> QueuePriority
+  locked price, budget rose on the decision day         -> LockedPrice
   F6 offer sent with no discovery                       -> ContactGuards
   F7 offer to a customer who already bought             -> ContactGuards
   F8 unfit accounts stay closed                         -> Regression
@@ -177,6 +179,22 @@ class QueuePriority(unittest.TestCase):
                 head = {item["cid"] for item in queue(ctx)["items"][:messages_left(ctx)]}
                 self.assertTrue(set(due) <= head, f"due callbacks outside today's {messages_left(ctx)} messages")
 
+    def test_second_round_order(self):
+        """Day 6, the last launch-price day: due callback, then the last day to lock a price,
+        then decision-day offers by profit (Premium before Pro), then the rest."""
+        ctx = FakeCtx(day=6)
+        ctx.add("pro_today", RIVERSIDE | {"nice_to_haves": [], "max_budget_cents": 5800, "ready_day": 6}, contacted=2)
+        ctx.add("premium_today", RIVERSIDE | {"needs": ["scheduling", "reminders", "location_reporting"],
+                                              "nice_to_haves": [], "budget_cents": 9500,
+                                              "max_budget_cents": 9500, "ready_day": 6}, contacted=2)
+        ctx.add("lock", ANCHOR_LIKE, contacted=2)                     # $51 holds only if quoted today
+        ctx.add("due", FABLE | {"ready_day": 6, "open_question": ""}, contacted=1, callback_day=6)
+        order = [i["cid"] for i in queue(ctx)["items"] if i["p"] == 1]
+        self.assertEqual(order, ["due", "lock", "premium_today", "pro_today"])
+
+    def test_discovery_target_is_day_4(self):
+        self.assertEqual(tools.DISCOVERY_TARGET_DAY, 4)
+
     def test_message_budget_comes_from_status_not_60(self):
         for minutes in (60, 120):
             with self.subTest(minutes=minutes):
@@ -189,60 +207,62 @@ class QueuePriority(unittest.TestCase):
 
 class DayCheck(unittest.TestCase):
     """F2. Day 5: the model wrote "no contact minutes left" with 10 messages left and three
-    callbacks due (Riverside, Maple, Fable). day_check must say whether the day may end."""
+    callbacks due (Riverside, Maple, Fable). check_time must say whether the day may end."""
 
-    def day_check(self, ctx):
-        fn = getattr(tools, "day_check", None)
+    def check_time(self, ctx):
+        fn = getattr(tools, "check_time", None)
         if fn is None:
-            self.fail("tools.day_check does not exist yet")
+            self.fail("tools.check_time does not exist yet")
         result = fn(ctx)
-        self.assertIn("ok_to_end", result)
+        self.assertIn("may_end_day", result)
         return result
 
-    def test_day_check_is_a_tool(self):
-        fn = getattr(tools, "day_check", None)
-        self.assertIsNotNone(fn, "tools.day_check does not exist yet")
-        self.assertTrue(hasattr(fn, "tool_schema"), "day_check must be decorated with @tool")
+    def test_check_time_is_a_tool(self):
+        fn = getattr(tools, "check_time", None)
+        self.assertIsNotNone(fn, "tools.check_time does not exist yet")
+        self.assertTrue(hasattr(fn, "tool_schema"), "check_time must be decorated with @tool")
 
-    def test_not_ok_to_end_with_minutes_and_work(self):
+    def test_may_not_end_with_minutes_and_work(self):
         for minutes in (60, 120):
             with self.subTest(minutes=minutes):
                 ctx = FakeCtx(day=5, minutes=minutes - 10)
                 ctx.add("lead363", RIVERSIDE, contacted=3, callback_day=5)
-                result = self.day_check(ctx)
-                self.assertFalse(result["ok_to_end"])
+                result = self.check_time(ctx)
+                self.assertFalse(result["may_end_day"])
                 self.assertIn("lead363", str(result.get("do_next", "")), "say which account to contact next")
                 self.assertEqual(result.get("messages_left_today"), (minutes - 10) // MINUTES_PER_EXCHANGE)
 
-    def test_not_ok_to_end_with_first_contacts_left(self):
+    def test_may_not_end_with_first_contacts_left(self):
         for minutes in (60, 120):
             with self.subTest(minutes=minutes):
                 ctx = FakeCtx(day=5, minutes=minutes)
                 ctx.add("new1").add("new2")
-                self.assertFalse(self.day_check(ctx)["ok_to_end"])
+                self.assertFalse(self.check_time(ctx)["may_end_day"])
 
-    def test_ok_to_end_when_out_of_minutes(self):
+    def test_may_end_when_out_of_minutes(self):
         for minutes in (0, MINUTES_PER_EXCHANGE - 1):
             with self.subTest(minutes=minutes):
                 ctx = FakeCtx(day=5, minutes=minutes)
                 ctx.add("lead363", RIVERSIDE, contacted=3, callback_day=5)
-                self.assertTrue(self.day_check(ctx)["ok_to_end"])
+                self.assertTrue(self.check_time(ctx)["may_end_day"])
 
-    def test_ok_to_end_when_nobody_needs_contact(self):
+    def test_may_end_when_nobody_needs_contact(self):
         for minutes in (60, 120):
             with self.subTest(minutes=minutes):
                 ctx = FakeCtx(day=2, minutes=minutes)
                 ctx.add("lead859", FABLE | {"open_question": ""}, contacted=1)   # decides on day 5
                 ctx.add("lead162", ATLAS | {"dropped": True, "close": "capability"}, contacted=1)
-                self.assertTrue(self.day_check(ctx)["ok_to_end"])
+                self.assertTrue(self.check_time(ctx)["may_end_day"])
 
-    def test_budget_blocked_customer_counts_only_on_its_extra_day(self):
-        ctx = FakeCtx(day=11)
-        ctx.add("lead956", JUNIPER_CLOSED, contacted=10)
-        self.assertFalse(self.day_check(ctx)["ok_to_end"], "the one extra contact is still due")
-        ctx = FakeCtx(day=12)
-        ctx.add("lead956", JUNIPER_CLOSED | {"persuasions": 1, "last_persuade_day": 11}, contacted=11)
-        self.assertTrue(self.day_check(ctx)["ok_to_end"], "the extra day is used: nobody needs contact")
+    def test_extra_budget_contact_keeps_the_day_open_until_used(self):
+        for minutes in (60, 120):
+            with self.subTest(minutes=minutes):
+                ctx = FakeCtx(day=11, minutes=minutes)
+                ctx.add("lead956", JUNIPER_CLOSED, contacted=10)
+                self.assertFalse(self.check_time(ctx)["may_end_day"], "the one extra contact is still due")
+                ctx = FakeCtx(day=12, minutes=minutes)
+                ctx.add("lead956", JUNIPER_CLOSED | {"persuasions": 1, "last_persuade_day": 11}, contacted=11)
+                self.assertTrue(self.check_time(ctx)["may_end_day"], "the extra contact is used: nobody needs contact")
 
 
 # --------------------------------------------------------------------------- F3
@@ -335,43 +355,118 @@ class DecisionDay(unittest.TestCase):
         self.assertEqual((a["kind"], a["plan"], a["price_cents"]), ("offer", "pro", 5800))
 
 
+# --------------------------------------------------------------------------- locked prices
+
+LOCK_Q = {"id": "run:quote:Q0026", "product_id": "pro", "monthly_price_cents": 5100,
+          "issued_day": 6, "expires_day": 9}
+ANCHOR = lead(needs=["scheduling", "reminders"], budget_cents=4800, max_budget_cents=4800, ready_day=9,
+              scope_final=False, best_price_offered=True)                               # lead222 after day 6
+
+
+class LockedPrice(unittest.TestCase):
+    """Anchor (lead222) was locked at Pro $51 on day 6 with a $48 budget that hung on a day-9 funding
+    decision; on day 9 the limit rose to $54 and it accepted the lock. Day 9's lowest legal Pro price
+    was $57. A budget that rises above $57 must be quoted higher, and asked about before quoting."""
+
+    STANDARD_POLICY = {"discount": 5, "valid": 2}
+
+    def assess(self, record):
+        return tools._assess(record, PRODUCTS, 9, CAMPAIGN_DAYS, self.STANDARD_POLICY, [], [LOCK_Q])
+
+    def test_budget_risen_above_legal_price_is_quoted_fresh(self):
+        a = self.assess(ANCHOR | {"budget_cents": 6000, "max_budget_cents": 6000, "scope_final": True})
+        self.assertEqual((a["kind"], a["plan"], a["price_cents"]), ("offer", "pro", 6000))
+        self.assertNotIn("reuse_quote", a, "do not re-present the cheaper $51 lock")
+
+    def test_budget_still_below_legal_price_keeps_the_lock(self):
+        a = self.assess(ANCHOR | {"budget_cents": 5400, "max_budget_cents": 5400, "scope_final": True})
+        self.assertEqual((a["plan"], a["price_cents"], a.get("reuse_quote")), ("pro", 5100, LOCK_Q["id"]))
+
+    def test_pending_decision_lock_asks_first_on_the_decision_day(self):
+        ctx = FakeCtx(day=9)
+        ctx.add("lead222", ANCHOR, contacted=6, callback_day=9, quotes=[LOCK_Q])
+        own = items_for(queue(ctx), "lead222")
+        self.assertEqual([i["kind"] for i in own], ["confirm"])
+        self.assertTrue(own[0]["do"].startswith("send_message lead222"))
+        self.assertNotIn("price_cents", own[0]["do"], "no price before the answer")
+        self.assertEqual(queue(ctx)["items"][0]["cid"], "lead222", "a due decision day still ranks first")
+
+    def test_after_the_answer_the_offer_follows_the_same_day(self):
+        ctx = FakeCtx(day=9)
+        ctx.add("lead222", ANCHOR | {"budget_cents": 5400, "max_budget_cents": 5400, "scope_final": True},
+                contacted=9, callback_day=9, quotes=[LOCK_Q]).touched_today("lead222", 1)
+        own = items_for(queue(ctx), "lead222")
+        self.assertEqual(len(own), 1)
+        self.assertTrue(own[0]["do"].startswith("offer lead222 (product_id='pro', price_cents=5100)"), own[0]["do"])
+
+    def test_settled_lock_is_re_presented_without_asking(self):
+        """Kestrel/Cobalt: scope final, budget fixed: one message, the lock."""
+        ctx = FakeCtx(day=9)
+        ctx.add("lead369", ANCHOR | {"budget_cents": 5300, "max_budget_cents": 5300, "scope_final": True,
+                                     "best_price_offered": False},
+                contacted=6, callback_day=9, quotes=[LOCK_Q | {"monthly_price_cents": 5300}])
+        own = items_for(queue(ctx), "lead369")
+        self.assertEqual([i["kind"] for i in own], ["offer"])
+        self.assertIn("price_cents=5300", own[0]["do"])
+
+
 # --------------------------------------------------------------------------- F5
 
 class BudgetBlocked(unittest.TestCase):
     """F5. About 25 losing offers to 9 accounts whose cap was below the lowest legal price (Chorus,
     Lumen, Finch, Meadow, Cedar, Juniper, Alder, Solstice, Oakbridge), Alder 3 times on day 8.
-    Rule: after the decline, one more contact on one more day (moved to the next day with room if
-    a day is full), then stop."""
+    Rule: ONE final offer at the lowest legal price, timed to be valid on the decision day, asking
+    whether budget or needs changed. After a decline: never again that day; ONE more contact on a later
+    day with spare minutes, ranked after all other work; then the account is closed for good."""
+
+    def test_budget_below_floor_gets_one_final_offer(self):
+        record = lead(budget_cents=2700, max_budget_cents=2700, ready_day=10)          # Juniper before the offer
+        ctx = FakeCtx(day=10)
+        ctx.add("lead956", record, contacted=9)
+        own = items_for(queue(ctx), "lead956")
+        self.assertEqual(len(own), 1)
+        self.assertIn("price_cents=2850", own[0]["do"], "the lowest legal Basic price after day 7")
+        self.assertRegex(own[0]["do"], r"budget or requirements have changed", "ask whether anything changed")
 
     def test_declined_lowest_price_closes_on_budget(self):
         record = {k: v for k, v in JUNIPER_CLOSED.items() if k not in ("dropped", "close")}
         a = tools._assess(record, PRODUCTS, 10, CAMPAIGN_DAYS, {"discount": 5, "valid": 2}, [], [])
         self.assertEqual((a["kind"], a.get("close")), ("closed", "budget"))
 
-    def test_no_second_offer_on_the_day_of_the_decline(self):
+    def test_no_second_contact_on_the_day_of_the_decline(self):
         ctx = FakeCtx(day=10)
-        ctx.add("lead956", JUNIPER_CLOSED, contacted=10).touched_today("lead956", 2)
+        ctx.add("lead956", JUNIPER_CLOSED, contacted=10).touched_today("lead956", 1)
         self.assertEqual(items_for(queue(ctx), "lead956"), [])
 
-    def test_one_extra_day_then_stop(self):
+    def test_one_extra_contact_on_a_later_day(self):
         ctx = FakeCtx(day=11)
         ctx.add("lead956", JUNIPER_CLOSED, contacted=10)
-        self.assertEqual([i["kind"] for i in items_for(queue(ctx), "lead956")], ["persuade"])
+        own = items_for(queue(ctx), "lead956")
+        self.assertEqual([i["kind"] for i in own], ["persuade"])
+        self.assertIn("price_cents=2850", own[0]["do"])
+        self.assertRegex(own[0]["do"], r"budget or requirements have changed")
+
+    def test_closed_for_good_after_the_extra_contact(self):
         ctx = FakeCtx(day=12)
         ctx.add("lead956", JUNIPER_CLOSED | {"persuasions": 1, "last_persuade_day": 11}, contacted=11)
-        self.assertEqual(items_for(queue(ctx), "lead956"), [], "the extra day is used")
+        self.assertEqual(items_for(queue(ctx), "lead956"), [], "only one extra contact")
 
     def test_a_full_day_moves_the_extra_contact_forward(self):
         ctx = FakeCtx(day=12)
-        ctx.add("lead956", JUNIPER_CLOSED, contacted=10)        # day 11 had no room
+        ctx.add("lead956", JUNIPER_CLOSED, contacted=10)        # day 11 had no room: not used up
         self.assertEqual([i["kind"] for i in items_for(queue(ctx), "lead956")], ["persuade"])
 
-    def test_extra_contact_ranks_after_time_critical_work(self):
+    def test_extra_contact_ranks_after_all_other_work(self):
         ctx = FakeCtx(day=6)
         ctx.add("lead956", JUNIPER_CLOSED, contacted=5)
         ctx.add("lead363", RIVERSIDE | {"ready_day": 6}, contacted=3, callback_day=6)
-        kinds = [i["cid"] for i in queue(ctx)["items"]]
-        self.assertLess(kinds.index("lead363"), kinds.index("lead956"))
+        ctx.add("lock", ANCHOR_LIKE, contacted=2)
+        ctx.add("buy", RIVERSIDE | {"ready_day": 4}, contacted=2)              # can wait: same price tomorrow
+        order = [i["cid"] for i in queue(ctx)["items"]]
+        self.assertEqual(order[-1], "lead956", order)
+
+    def test_one_extra_contact_is_the_setting(self):
+        self.assertEqual(tools.MAX_PERSUASIONS, 1)
 
 
 # --------------------------------------------------------------------------- F6, F7
@@ -394,10 +489,11 @@ class ContactGuards(unittest.TestCase):
         sequence = try_tools([
             ("offer", {"customer_id": "nimbus", "product_id": "pro", "price_cents": 6000,
                        "message": "Pro is $60.00 per month."}),
-            ("work_queue", {}),
+            ("check_time", {}),                                             # read-only: sends nothing
         ], case="requirements_update", root=ROOT)
         refused, after = (as_dict(o) for o in outputs(sequence))
         self.assertIn("error", refused, "an offer needs a recorded first contact")
+        self.assertIn("first_contact nimbus", refused["do_next"])
         self.assertEqual(after["messages_left_today"], 24, "a refused offer costs no minutes")
 
     def test_offer_to_a_customer_who_bought_is_refused_and_free(self):
@@ -405,7 +501,7 @@ class ContactGuards(unittest.TestCase):
             ("work_queue", {}),                                             # sends the first contact
             ("record_lead", {"customer_id": "nimbus", "needs": ["scheduling", "reminders"], "nice_to_haves": [],
                              "integrations": ["BookFlow"], "budget_cents": 6000, "max_budget_cents": None,
-                             "ready_day": None, "scope_final": True, "open_question": "",
+                             "ready_day": None, "scope_final": True, "pending_features": [], "open_question": "",
                              "unsellable_reason": "", "notes": ""}),
             ("offer", {"customer_id": "nimbus", "product_id": "pro", "price_cents": 6000,
                        "message": "Pro covers BookFlow and reminders at $60.00 per month."}),
@@ -440,7 +536,7 @@ class Regression(unittest.TestCase):
             ("work_queue", {}),                                             # first contact to atlas
             ("record_lead", {"customer_id": "atlas", "needs": ["scheduling"], "nice_to_haves": [],
                              "integrations": ["CalendarLink"], "budget_cents": 3000, "max_budget_cents": 3000,
-                             "ready_day": 2, "scope_final": True, "open_question": "",
+                             "ready_day": 2, "scope_final": True, "pending_features": [], "open_question": "",
                              "unsellable_reason": "", "notes": "Follow up on day 2 with Basic at $30."}),
             "end_day",
             ("work_queue", {}),
