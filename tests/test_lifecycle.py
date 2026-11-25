@@ -512,7 +512,7 @@ class BudgetBelowFloor(unittest.TestCase):
         self.assertEqual(out["decision"], "decline")
         lead = c.state["leads"]["lead956"]
         self.assertTrue(lead["best_price_offered"])
-        self.assertIn(out["quote"], lead["declined_quotes"])
+        self.assertIn(c.accounts["lead956"]["quotes"][-1]["id"], lead["declined_quotes"])
         c.record("lead956")
         self.assertTrue(c.state["leads"]["lead956"]["dropped"])
         self.assertEqual(c.state["leads"]["lead956"]["close"], "budget")
