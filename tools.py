@@ -24,10 +24,10 @@ import re
 from sales_sim import tool
 
 
-DISCOVERY_TARGET_DAY = 6        # reach every account by this day (the day before a worse price change if sooner)
+DISCOVERY_TARGET_DAY = 4        # reach every account by this day (the day before a worse price change if sooner)
 MAX_TOUCHES_DISCOVERY = 4       # messages per customer per day while accounts are still uncontacted
 MAX_TOUCHES_AFTER = 8           # relaxed once every account has been reached
-MAX_PERSUASIONS = 0             # the one final offer at the lowest legal price is the only persuasion
+MAX_PERSUASIONS = 1             # after the final offer is declined: one more spare-time contact, then close
 MAX_FIRST_CONTACT_DOCS = 4      # documents attached to a first contact
 DOC_MATCH = 0.3                 # cosine similarity a document needs to be attached
 SENTENCE_MATCH = 0.15           # cosine similarity a sentence needs to be quoted
@@ -194,8 +194,11 @@ def _assess(lead, products, today, last_day, base, changes, quotes):
                 if _min_price(product, policy["discount"]) <= price and day + policy["valid"] >= ready:
                     plan = {"present_day": day, "accept_day": ready}
                     break
-        # A quote already issued for this plan within the cap and valid on the ready day counts too.
-        for quote in _valid_issued(quotes, today):
+        # A quote already issued for this plan within the cap and valid on the ready day counts too:
+        # it already holds any earlier lock, so it is never re-issued. Only a fresh quote on the ready
+        # day itself (a budget that rose above that day's legal price) beats the cheaper lock.
+        fresh_on_ready_day = plan is not None and plan["present_day"] == ready
+        for quote in ([] if fresh_on_ready_day else _valid_issued(quotes, today)):
             if (quote["product_id"] == product["id"] and quote["monthly_price_cents"] <= cap
                     and quote["expires_day"] >= ready):
                 plan = {"present_day": ready, "accept_day": ready, "reuse_quote": quote["id"]}
@@ -209,10 +212,15 @@ def _assess(lead, products, today, last_day, base, changes, quotes):
         # Budget below every legal price. A final offer at the lowest legal price may still be
         # accepted (budgets can move); make it once, timed to be valid on the decision day.
         lowest_today = {p["id"]: _min_price(p, base["discount"]) for p in fits}
+        declined = set(lead.get("declined_quotes", []))
         for quote in _valid_issued(quotes, today):
-            # Only a locked quote cheaper than anything legal today is worth re-presenting.
+            # Only a locked quote cheaper than anything legal today is worth re-presenting, and only
+            # once: a quote they declined comes back only if a pending decision may have moved the budget.
+            if quote["id"] in declined and not provisional:
+                continue
+            # A quote at today's lowest legal price is a lock held until the decision day, too.
             if (quote["product_id"] in lowest_today and quote["expires_day"] >= ready
-                    and quote["monthly_price_cents"] < lowest_today[quote["product_id"]]):
+                    and quote["monthly_price_cents"] <= lowest_today[quote["product_id"]]):
                 kind = "offer" if ready <= today else "later"
                 return {"kind": kind, "plan": quote["product_id"], "price": _money(quote["monthly_price_cents"]),
                         "price_cents": quote["monthly_price_cents"], "present_day": ready, "accept_day": ready,
@@ -317,6 +325,46 @@ def _touch(ctx, customer_id, day):
     touches[customer_id] = touches.get(customer_id, 0) + 1
 
 
+LONG_SHOT_TIER = 5     # final offers to fixed budgets below every legal price, and the extra contact
+
+
+def _upgrade_lock(lead, account, products, today, base, changes):
+    """A provisional customer whose pending decision may add a feature their current plan lacks
+    (record_lead's pending_features, judged by the model from what they said):
+    on the last day a quote presented today still covers their decision day at a price that will
+    be gone by then, lock the plan with that feature at today's lowest legal price (Oakbridge:
+    Premium $85 on day 6 for a day-9 review that added location reporting). Returns
+    (product, price, feature) or None."""
+    ready = lead.get("ready_day")
+    if lead.get("scope_final", True) or ready is None or ready <= today or lead.get("unsellable_reason"):
+        return None
+    fits = _fitting_plans(lead, products)
+    if not fits:
+        return None
+    current = set(fits[0]["features"])
+    possible = set(lead.get("pending_features", []))
+    now, tomorrow = _policy_on(today, base, changes), _policy_on(today + 1, base, changes)
+    if today + now["valid"] < ready:
+        return None                                  # a quote presented today would expire too early
+    for product in sorted(products, key=lambda p: p["monthly_price_cents"]):
+        added = set(product["features"]) - current
+        if (not added or not current <= set(product["features"])
+                or not set(i.lower() for i in lead.get("integrations", [])) <= {i.lower() for i in product["integrations"]}):
+            continue
+        feature = next((f for f in sorted(added) if f in possible), None)
+        if not feature:
+            continue
+        price = _min_price(product, now["discount"])
+        later_price = _min_price(product, _policy_on(ready, base, changes)["discount"])
+        still_tomorrow = (today + 1 + tomorrow["valid"] >= ready
+                          and _min_price(product, tomorrow["discount"]) <= price)
+        held = any(q["product_id"] == product["id"] and q["issued_day"] is not None
+                   and q["expires_day"] >= ready for q in account["quotes"])
+        if later_price > price and not still_tomorrow and not held:
+            return product, price, feature
+    return None
+
+
 def _build_queue(ctx):
     """Today's tasks in priority order: 0 record replies, 1 time-critical, 2 first contacts,
     3 (once every account is reached) answers and persuasion for customers not yet converted."""
@@ -354,15 +402,11 @@ def _build_queue(ctx):
         a = _assess(lead, catalog["products"], today, last_day, base, changes, account["quotes"])
         kind = a["kind"]
         question = lead.get("open_question", "")
-        # A pending question is answered at once, inside an offer of the plan (answer first, then price).
-        if kind in ("later", "need_budget") and question and a.get("plan"):
-            plan = next(p for p in catalog["products"] if p["id"] == a["plan"])
-            if a["price_cents"] >= _min_price(plan, base["discount"]):
-                kind = "answer_offer"
-        if kind in ("offer", "lock", "best_price", "need_budget", "answer_offer"):
+        # A pending question waits for the decision day: the decision-day offer answers it first.
+        # Before that day the customer is contacted only to lock a price.
+        if kind in ("offer", "lock", "best_price", "need_budget"):
             label = {"offer": "CALLBACK DUE, OFFER" if due else "OFFER", "lock": "LOCK PRICE",
-                     "best_price": "FINAL OFFER (lowest legal price)", "need_budget": "OFFER (budget unknown)",
-                     "answer_offer": "ANSWER + OFFER"}[kind]
+                     "best_price": "FINAL OFFER (lowest legal price)", "need_budget": "OFFER (budget unknown)"}[kind]
             reuse = f" (re-presents {a['reuse_quote']})" if a.get("reuse_quote") else ""
             # Urgent: a callback or decision day today, a price lock, or a price that waiting would lose.
             # Otherwise the offer can wait behind today's reserved first contacts.
@@ -371,26 +415,68 @@ def _build_queue(ctx):
                         if today < last_day else {})
             can_wait = (not due and kind != "lock" and (ready_day is None or ready_day < today)
                         and tomorrow.get("plan") == a.get("plan") and tomorrow.get("price_cents") == a.get("price_cents"))
-            items.append({"p": 3 if can_wait else 1, "kind": kind, "cid": cid,
+            # Order: due callback; then last chances (the last day a lock holds its price, or a sale
+            # affordable today but not tomorrow); then decision-day offers by profit; then the rest.
+            # A final offer to a fixed budget below every legal price is a long shot: it goes last.
+            provisional = not lead.get("scope_final", True)
+            long_shot = bool(a.get("final")) and not provisional
+            last_lock = kind == "lock" and (tomorrow.get("kind") not in ("lock", "offer")
+                                            or tomorrow.get("price_cents") != a.get("price_cents"))
+            lost_tomorrow = (today < last_day and not long_shot and kind in ("offer", "need_budget")
+                             and (tomorrow.get("plan"), tomorrow.get("price_cents"))
+                             != (a.get("plan"), a.get("price_cents")))
+            decision_day = kind in ("offer", "best_price") and (ready_day is None or ready_day <= today)
+            rank = 0 if due else 1 if (last_lock or lost_tomorrow) else 2 if decision_day else 3
+            tier = 1 if due else LONG_SHOT_TIER if long_shot else 3 if can_wait else 1
+            product = next(p for p in catalog["products"] if p["id"] == a["plan"])
+            # A locked price on the decision day of a customer whose budget hung on a pending decision:
+            # ask first, so a budget that rose above today's legal price is quoted higher, not at the lock.
+            locked = next((q for q in account["quotes"] if q["id"] == a.get("reuse_quote")
+                           and q["issued_day"] is not None and q["issued_day"] < today), None)
+            if (locked and decision_day and not lead.get("scope_final", True)
+                    and touched_today.get(cid, 0) == 0):
+                items.append({"p": 1, "kind": "confirm", "cid": cid, "due": bool(due), "rank": rank,
+                              "profit": a["price_cents"] - product["monthly_service_cost_cents"],
+                              "text": f"CONFIRM {tag}: decision day; locked {a['plan']} at {a['price']} "
+                                      f"({locked['id']}); ask what changed before quoting",
+                              "do": (f"send_message {cid}: their decision is due today. "
+                                     + (f"First answer \"{question[:120]}\" by {_answer_for(ctx, question, lead)} "
+                                        if question else "")
+                                     + "Ask in one message whether the decision changed their must-haves or "
+                                       "budget, and what their approved monthly limit is now. Do not quote a "
+                                       "price in this message. Then record_lead with the answer.")})
+                continue
+            items.append({"p": tier, "kind": kind, "cid": cid, "due": bool(due), "rank": rank,
+                          "profit": a["price_cents"] - product["monthly_service_cost_cents"],
                           "text": f"{label} {tag}: {a['plan']} at {a['price']}{reuse}",
                           "do": _offer_instruction(ctx, cid, a, question, reuse, lead)})
         elif kind == "reask":
-            items.append({"p": 1, "kind": kind, "cid": cid,
+            # A decision day is a promised callback: same ranking as one (Spruce missed its day 6).
+            items.append({"p": 1, "kind": kind, "cid": cid, "due": True, "rank": 0,
                           "text": f"DECISION DAY {tag}: a must-have was unavailable but their decision was pending",
                           "do": f"send_message {cid}: ask in one message whether the decision changed their must-haves "
                                 f"and budget"})
         elif due:
-            items.append({"p": 1, "kind": "callback", "cid": cid,
+            items.append({"p": 1, "kind": "callback", "cid": cid, "due": True, "rank": 0,
                           "text": f"CALLBACK DUE {tag}: {due[0]['reason'][:70]}",
                           "do": f"send_message {cid}: keep the promised follow-up ({due[0]['reason'][:60]})"})
         elif kind == "later":
             when = a.get("present_day") or a.get("ready_day") or today + 1
             later.append((when, cid))
-            if question and everyone_reached:
-                # Spare time: answer a customer still deciding, so their decision day goes smoothly.
-                items.append({"p": 5, "kind": "answer", "cid": cid,
-                              "text": f"ANSWER {tag}: open question; decides day {when}",
-                              "do": _answer_instruction(ctx, cid, question)})
+        if not any(item["cid"] == cid for item in items) and touched_today.get(cid, 0) == 0:
+            upgrade = _upgrade_lock(lead, account, catalog["products"], today, base, changes)
+            if upgrade:
+                product, price, feature = upgrade
+                ready_day = lead["ready_day"]
+                items.append({"p": 1, "kind": "lock_upgrade", "cid": cid, "rank": 1,
+                              "profit": price - product["monthly_service_cost_cents"],
+                              "text": f"LOCK UPGRADE {tag}: {product['id']} at {_money(price)} in case their "
+                                      f"day-{ready_day} decision adds {feature.replace('_', ' ')}",
+                              "do": (f"offer {cid} (product_id='{product['id']}', price_cents={price}). Message: "
+                                     f"their decision on day {ready_day} may add {feature.replace('_', ' ')}. Say "
+                                     f"this {product['name']} price is held through day {ready_day} only in case "
+                                     "the decision adds it, that they need not decide now, and that the plan "
+                                     "fitting their current needs stays available. No pressure.")})
 
     # First contacts: a daily quota, fixed at the day's first queue, spreads the remaining accounts
     # over the days left before the target (the day before a worse price change). The quota ranks
@@ -411,12 +497,13 @@ def _build_queue(ctx):
                       "do": f"first_contact {customer['id']}"})
 
     if everyone_reached:
-        # Spare time: persuade customers closed only on budget, at the lowest legal price.
+        # Spare time, lowest priority: one more contact to customers closed only on budget, never on the
+        # day they declined; a full day moves it to the next day with room.
         by_id = {c["id"]: c for c in customers}
         for cid, lead in leads.items():
             customer = by_id.get(cid)
             if (not customer or customer["status"] != "prospect" or lead.get("close") != "budget"
-                    or not customer["contact"]["eligible"] or touched_today.get(cid, 0) >= touch_limit
+                    or not customer["contact"]["eligible"] or touched_today.get(cid, 0) > 0
                     or lead.get("persuasions", 0) >= MAX_PERSUASIONS or lead.get("last_persuade_day") == today):
                 continue
             fits = _fitting_plans(lead, catalog["products"])
@@ -424,12 +511,12 @@ def _build_queue(ctx):
                 continue
             plan = min(fits, key=lambda p: _min_price(p, base["discount"]))
             pitch = {"plan": plan["id"], "price_cents": _min_price(plan, base["discount"])}
-            items.append({"p": 5, "kind": "persuade", "cid": cid,
+            items.append({"p": LONG_SHOT_TIER, "kind": "persuade", "cid": cid,
                           "text": f"PERSUADE {cid} ({customer['business']}): {plan['id']} at "
                                   f"{_money(pitch['price_cents'])}, lowest legal price "
                                   f"(attempt {lead.get('persuasions', 0) + 1} of {MAX_PERSUASIONS})",
                           "do": _persuade_instruction(ctx, cid, pitch, lead)})
-    items.sort(key=lambda item: item["p"])
+    items.sort(key=lambda item: (item["p"], item.get("rank", 3), -item.get("profit", 0)))
 
     messages_left = status["minutes_remaining_today"] // status["minutes_per_exchange"]
     if not uncontacted:
@@ -456,12 +543,34 @@ def _build_queue(ctx):
             "sold": sum(c["status"] == "purchased" for c in customers), "do_next": do_next}
 
 
-def _quotes_for(ctx, question):
-    """Key document sentences answering a question, formatted to be quoted word for word."""
-    sentences = _key_sentences(ctx, question)
-    if not sentences:
+QUOTE_CLOSE = 0.9      # a second document is quoted too when it scores this close to the best one
+QUOTE_WIDE = 0.3       # after a repeated question: every document this close to the best one, up to 3
+
+
+def _same_question(a, b):
+    return bool(a and b) and set(_tokens(a)) == set(_tokens(b))
+
+
+def _quotes_for(ctx, question, repeat=False):
+    """The documents answering a question, in full, to be quoted word for word. Company documents are
+    short, and a whole document keeps facts that sentence picking drops (Driftwood's support hours).
+    After a repeated question the answer widens to the next-best documents."""
+    ranked = [(s, d) for s, d in _search_docs(ctx, question, exclude=NOT_ANSWERS)[:3] if s >= 0.1]
+    if not ranked:
         return "(no document matched: use find_docs)"
-    return " ".join(f"\"{sentence}\" [{doc_id}]" for doc_id, sentence in sentences)
+    best = ranked[0][0]
+    chosen = [d for s, d in ranked if s >= best * (QUOTE_WIDE if repeat else QUOTE_CLOSE)]
+    return " ".join(f"\"{d['text']}\" [{d['id']}]" for d in chosen)
+
+
+def _answer_for(ctx, question, lead):
+    """The quoting instruction for an open question; a repeat gets more documents and find_docs."""
+    repeat = _same_question(question, (lead or {}).get("last_answered", ""))
+    text = f"quoting these documents word for word: {_quotes_for(ctx, question, repeat)}"
+    if repeat:
+        text += (" They asked this again, so the last answer missed what they need: call find_docs with "
+                 "their question first and answer every part of it (when, how, which plan) from the documents.")
+    return text
 
 
 def _offer_instruction(ctx, customer_id, assessment, question, reuse, lead=None):
@@ -469,14 +578,14 @@ def _offer_instruction(ctx, customer_id, assessment, question, reuse, lead=None)
     call = (f"offer {customer_id} (product_id='{assessment['plan']}', price_cents={assessment['price_cents']})"
             f"{reuse}.")
     if assessment.get("final") and lead is not None:
-        # Budget below every legal price: this single offer is the only persuasion attempt.
+        # Budget below every legal price: the final offer, asking whether anything changed.
         pitch = {"plan": assessment["plan"], "price_cents": assessment["price_cents"]}
         return (_persuade_instruction(ctx, customer_id, pitch, lead)
-                + " Ask them to tell you if their budget or requirements have changed. If they decline, "
-                  "the account is closed.")
+                + " Ask them to tell you if their budget or requirements have changed.")
     if question:
-        return (f"{call} Message: first answer \"{question[:120]}\" by quoting these document sentences "
-                f"word for word: {_quotes_for(ctx, question)} Then state the plan and price.")
+        return (f"{call} Message: first answer \"{question[:120]}\" by {_answer_for(ctx, question, lead)} "
+                "Then ask whether their needs or budget have "
+                "changed. Then state the plan and price.")
     return (f"{call} Message: state the plan, price and how it covers what they said they need, "
             "and invite them to say if anything changed. No small talk.")
 
@@ -494,10 +603,11 @@ def _persuade_instruction(ctx, customer_id, pitch, lead):
     risk_line = f" Lower the risk by quoting: \"{risk[0][1]}\"" if risk else ""
     reasons = ", ".join(lead.get("needs", []) + lead.get("nice_to_haves", [])) or "their stated needs"
     question = lead.get("open_question", "")
-    answer = (f" First answer \"{question[:100]}\" by quoting: {_quotes_for(ctx, question)}" if question else "")
+    answer = (f" First answer \"{question[:100]}\" by {_answer_for(ctx, question, lead)}" if question else "")
     return (f"offer {customer_id} (product_id='{pitch['plan']}', price_cents={pitch['price_cents']}). "
             f"Message:{answer} Persuade briefly: the plan solves {reasons}; this is the lowest price the policy "
-            f"allows.{risk_line} One short, honest message; no pressure, no promises beyond the documents.")
+            f"allows.{risk_line} Ask whether their budget or requirements have changed. One short, honest "
+            "message; no pressure, no promises beyond the documents.")
 
 
 # --------------------------------------------------------------------------- document retrieval (cosine)
@@ -576,6 +686,9 @@ def _search_docs(ctx, query, exclude=()):
     return scored
 
 
+SENTENCE_END = re.compile(r"(?<![ap]\.m\.)(?<!e\.g\.)(?<!i\.e\.)(?<=[.!?])\s+(?=[A-Z\"(])")   # keeps "8 a.m. to 6 p.m." whole
+
+
 def _key_sentences(ctx, question, limit=3):
     """The sentences from the best documents that answer a question, to be quoted word for word."""
     ranked = [(s, d) for s, d in _search_docs(ctx, question, exclude=NOT_ANSWERS)[:3] if s >= 0.1]
@@ -585,7 +698,7 @@ def _key_sentences(ctx, question, limit=3):
     q = _weigh(_bag(question), idf)
     scored = []
     for _, d in ranked:
-        for sentence in re.split(r"(?<=[.!?])\s+", d["text"]):
+        for sentence in SENTENCE_END.split(d["text"]):
             score = _cosine(q, _weigh(_bag(sentence), idf))
             if score >= SENTENCE_MATCH:
                 scored.append((score, d["id"], sentence.strip()))
@@ -791,7 +904,8 @@ def read_account(ctx, customer_id: str) -> dict:
 @tool
 def record_lead(ctx, customer_id: str, needs: list[str], nice_to_haves: list[str], integrations: list[str],
                 budget_cents: int | None, max_budget_cents: int | None, ready_day: int | None,
-                scope_final: bool, open_question: str, unsellable_reason: str, notes: str) -> dict:
+                scope_final: bool, pending_features: list[str], open_question: str, unsellable_reason: str,
+                notes: str) -> dict:
     """Save what a customer told you -- call it after EVERY customer reply. Returns the
     recommended plan, price and day, and do_next. When the next task is a first contact,
     this tool also SENDS it (one message) and returns that new customer's reply: record
@@ -811,6 +925,10 @@ def record_lead(ctx, customer_id: str, needs: list[str], nice_to_haves: list[str
       beyond the last day), give that later day number: the account is abandoned at once.
     scope_final: false if needs or budget depend on a pending meeting, review, funding or
       software decision.
+    pending_features: catalog feature ids the pending decision could ADD to their must-haves,
+      judged from what they said (e.g. "a review will decide whether we need site reporting"
+      -> location_reporting). [] if none, if scope_final is true, or if they said they do not
+      want it.
     open_question: the customer's question you have not answered yet, word for word; "" if none.
       The next offer answers it first (quoting document sentences), then gives the plan and price.
     unsellable_reason: non-empty only when a must-have is confirmed unavailable (check
@@ -827,10 +945,14 @@ def record_lead(ctx, customer_id: str, needs: list[str], nice_to_haves: list[str
     lead = {"needs": needs, "nice_to_haves": nice_to_haves, "integrations": integrations,
             "budget_cents": new_budget, "max_budget_cents": new_upper,
             "ready_day": ready_day, "scope_final": scope_final, "open_question": open_question.strip(),
+            "pending_features": [] if scope_final else [str(f).strip().lower() for f in pending_features
+                                                        if str(f).strip()],
+            "last_answered": previous.get("last_answered", ""),
             "unsellable_reason": unsellable_reason.strip(), "notes": notes[:300],
             # Prices learned from offer replies, and the one-time final offer, hold until the budget changes.
             "plan_caps": {} if budget_changed else previous.get("plan_caps", {}),
             "best_price_offered": False if budget_changed else previous.get("best_price_offered", False),
+            "declined_quotes": [] if budget_changed else previous.get("declined_quotes", []),
             "persuasions": previous.get("persuasions", 0), "last_persuade_day": previous.get("last_persuade_day")}
     leads[customer_id] = lead
     assessment = _assess_customer(ctx, customer_id)
@@ -916,6 +1038,7 @@ def send_message(ctx, customer_id: str, message: str) -> dict:
     has_valid_quote = bool(_valid_issued(account["quotes"], status["day"]))
     lead = ctx.state.get("leads", {}).get(customer_id)
     if lead and lead.get("open_question"):
+        lead["last_answered"] = lead["open_question"]
         lead["open_question"] = ""             # this message answers it
     result = ctx.talk_to_customer(customer_id=customer_id, message=message)
     if result["decision"] == "opt_out":
@@ -939,13 +1062,24 @@ def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str
     account, problem = _contact_check(ctx, customer_id)
     if problem:
         return problem
+    recorded = ctx.state.get("leads", {}).get(customer_id)
+    if not recorded or not recorded.get("needs"):
+        # No discovery yet: an offer would guess the plan (Copper Bicycle needed OtherSuite).
+        return {"error": f"No needs recorded for {customer_id}: discover them before offering.",
+                "do_next": (f"first_contact {customer_id}" if account["contact"]["last_contact_day"] is None
+                            else f"record_lead for {customer_id} from their last reply")}
     status, catalog = ctx.get_status(), ctx.get_catalog()
     today = status["day"]
     product = next((p for p in catalog["products"] if p["id"] == product_id), None)
     if product is None:
         return {"error": f"Unknown plan {product_id!r}. Plans: {[p['id'] for p in catalog['products']]}"}
+    # Re-present a held quote only at its own price, or when the asked price cannot be quoted fresh
+    # today: a higher legal price is never swapped for a cheaper lock.
+    fresh_legal = min(price_cents, product["monthly_price_cents"]) >= _min_price(
+        product, catalog["current_pricing_policy"]["max_discount_percent"])
     reuse = [q for q in _valid_issued(account["quotes"], today)
-             if q["product_id"] == product_id and q["monthly_price_cents"] <= price_cents]
+             if q["product_id"] == product_id and (q["monthly_price_cents"] == price_cents
+                                                   or (not fresh_legal and q["monthly_price_cents"] <= price_cents))]
     if reuse:
         quote = max(reuse, key=lambda q: q["monthly_price_cents"])
         expires = quote["expires_day"]
@@ -962,6 +1096,8 @@ def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str
     _touch(ctx, customer_id, today)
     lead = ctx.state.get("leads", {}).get(customer_id)
     if lead is not None and lead.get("needs") is not None:
+        if lead.get("open_question"):
+            lead["last_answered"] = lead["open_question"]
         lead["open_question"] = ""             # the offer message answers it
         if lead.get("close") == "budget":      # a persuasion attempt on an account closed on budget
             lead["persuasions"] = lead.get("persuasions", 0) + 1
@@ -975,7 +1111,15 @@ def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str
     reply_text = result["reply"]["text"] if result.get("reply") else ""
     at_most = re.search(r"at most \$([0-9][0-9,]*(?:\.[0-9]{2})?)", reply_text)
     if at_most and lead is not None and lead.get("needs") is not None and not result.get("order"):
-        lead.setdefault("plan_caps", {})[product_id] = round(float(at_most.group(1).replace(",", "")) * 100)
+        stated = round(float(at_most.group(1).replace(",", "")) * 100)
+        lead.setdefault("plan_caps", {})[product_id] = stated
+        if stated < _min_price(product, catalog["current_pricing_policy"]["max_discount_percent"]):
+            lead["best_price_offered"] = True  # they turned down our lowest legal price: the final offer is made
+    if (lead is not None and lead.get("needs") is not None and not result.get("order")
+            and result["decision"] in ("decline", "end_call")):
+        declined = lead.setdefault("declined_quotes", [])
+        if quote["id"] not in declined:
+            declined.append(quote["id"])       # never re-present it unless their budget or scope changes
     output = {"quote": quote["id"], "plan": product_id, "price": _money(quote["monthly_price_cents"]),
               "valid_through_day": expires, "decision": result["decision"],
               "reply": result["reply"]["text"] if result.get("reply") else None,
