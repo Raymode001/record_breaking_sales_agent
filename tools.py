@@ -1,7 +1,7 @@
 """The agent's tools. The model can call exactly the @tool functions in this file.
 
 Strategy these tools support (see prompt.py):
-  1. Reach every account early. A first contact is one templated message (first_contact):
+  1. Reach every account early. A first contact is one templated message (sent by the tools):
      the plans from the catalog, the answer to the concern in the account's CRM record
      (from company documents), and the discovery questions (needs, budget, approval day,
      whether the scope is final). First contacts rank right after time-critical work.
@@ -284,16 +284,17 @@ def _assess_customer(ctx, customer_id, catalog=None, status=None, account=None):
 
 
 def _summary(assessment):
-    """A compact recommendation for the model, never ending on a stop word."""
+    """The recommendation as one short string (every result is re-read on every later call)."""
     if not assessment:
         return None
-    keep = ("plan", "price", "present_day", "accept_day", "reuse_quote", "upsell_over", "why", "ready_day")
-    out = {k: assessment[k] for k in keep if k in assessment}
-    out["status"] = {"closed": "closed: no sale possible", "later": "nothing to do for this account today",
-                     "reask": "decision day: re-ask needs and budget", "need_budget": "offer today (budget unknown)",
-                     "offer": "offer today", "lock": "offer today to lock the price",
-                     "best_price": "one final offer today at the lowest legal price"}[assessment["kind"]]
-    return out
+    kind = assessment["kind"]
+    if kind == "closed":
+        return "closed: no sale possible"
+    status = {"later": f"day {assessment.get('present_day') or assessment.get('ready_day')}",
+              "reask": "re-ask today", "need_budget": "offer today", "offer": "offer today",
+              "lock": "lock today", "best_price": "final offer today"}[kind]
+    plan = f"{assessment['plan']} {assessment['price']} " if assessment.get("plan") else ""
+    return plan + status
 
 
 # --------------------------------------------------------------------------- the work queue
@@ -326,6 +327,22 @@ def _touch(ctx, customer_id, day):
 
 
 LONG_SHOT_TIER = 5     # final offers to fixed budgets below every legal price, and the extra contact
+
+
+def _declined_again(lead, quotes, plan, price_cents):
+    """True when the customer already declined this plan at this price or lower and nothing recorded
+    changed since (a new budget, needs or integrations clear declined_quotes): offering it again only
+    repeats a refusal (Meadow was sent the same Pro offer 9 times)."""
+    declined = set((lead or {}).get("declined_quotes", []))
+    return bool(plan) and price_cents is not None and any(
+        q["id"] in declined and q["product_id"] == plan and q["monthly_price_cents"] <= price_cents
+        for q in quotes)
+
+
+def _lacks(product, catalog):
+    """Catalog features this plan does not have: what a customer declining it may need."""
+    have = set(product["features"])
+    return sorted({f for p in catalog["products"] for f in p["features"]} - have)
 
 
 def _upgrade_lock(lead, account, products, today, base, changes):
@@ -365,16 +382,19 @@ def _upgrade_lock(lead, account, products, today, base, changes):
     return None
 
 
-def _build_queue(ctx):
+def _build_queue(ctx, skip=None, used=0):
     """Today's tasks in priority order: 0 record replies, 1 time-critical, 2 first contacts,
-    3 (once every account is reached) answers and persuasion for customers not yet converted."""
+    3 (once every account is reached) answers and persuasion for customers not yet converted.
+    skip / used: the queue as it will be after `skip` buys with `used` more messages sent
+    (worked out before an offer is sent, when reads are still allowed)."""
     status, catalog = ctx.get_status(), ctx.get_catalog()
     today, last_day = status["day"], status["campaign_days"]
     leads = ctx.state.get("leads", {})
     touches = ctx.state.get("touches", {})
     touched_today = touches if touches.get("day") == today else {}
     customers = ctx.list_customers()
-    prospects = [c for c in customers if c["status"] == "prospect" and not leads.get(c["id"], {}).get("dropped")]
+    prospects = [c for c in customers if c["status"] == "prospect" and c["id"] != skip
+                 and not leads.get(c["id"], {}).get("dropped")]
     uncontacted = [c for c in prospects if c["contact"]["last_contact_day"] is None]
     everyone_reached = not uncontacted
     touch_limit = MAX_TOUCHES_AFTER if everyone_reached else MAX_TOUCHES_DISCOVERY
@@ -404,6 +424,10 @@ def _build_queue(ctx):
         question = lead.get("open_question", "")
         # A pending question waits for the decision day: the decision-day offer answers it first.
         # Before that day the customer is contacted only to lock a price.
+        if (kind in ("offer", "lock", "best_price", "need_budget") and not due
+                and _declined_again(lead, account["quotes"], a.get("plan"), a.get("price_cents"))):
+            later.append((today + 1, cid))      # a refused offer is not repeated while nothing recorded changed
+            continue
         if kind in ("offer", "lock", "best_price", "need_budget"):
             label = {"offer": "CALLBACK DUE, OFFER" if due else "OFFER", "lock": "LOCK PRICE",
                      "best_price": "FINAL OFFER (lowest legal price)", "need_budget": "OFFER (budget unknown)"}[kind]
@@ -446,9 +470,14 @@ def _build_queue(ctx):
                                        "budget, and what their approved monthly limit is now. Do not quote a "
                                        "price in this message. Then record_lead with the answer.")})
                 continue
+            # A routine offer (no upsell, no persuasion, no repeated question) is written and sent by
+            # the tools themselves: one model call less per offer.
+            auto = (kind in ("offer", "lock", "need_budget") and not a.get("final") and not a.get("upsell_over")
+                    and (not question or _tool_quotes(question, lead)))
             items.append({"p": tier, "kind": kind, "cid": cid, "due": bool(due), "rank": rank,
                           "profit": a["price_cents"] - product["monthly_service_cost_cents"],
                           "text": f"{label} {tag}: {a['plan']} at {a['price']}{reuse}",
+                          "auto": auto, "plan": a["plan"], "price_cents": a["price_cents"],
                           "do": _offer_instruction(ctx, cid, a, question, reuse, lead)})
         elif kind == "reask":
             # A decision day is a promised callback: same ranking as one (Spruce missed its day 6).
@@ -494,7 +523,7 @@ def _build_queue(ctx):
         hint = customer["background"].split("Latest contact: ")[-1][:70]
         items.append({"p": 2 if n < reserved else 4, "kind": "first", "cid": customer["id"],
                       "text": f"FIRST CONTACT {customer['id']} (can buy today): {hint}",
-                      "do": f"first_contact {customer['id']}"})
+                      "do": "work_queue"})
 
     if everyone_reached:
         # Spare time, lowest priority: one more contact to customers closed only on budget, never on the
@@ -518,7 +547,7 @@ def _build_queue(ctx):
                           "do": _persuade_instruction(ctx, cid, pitch, lead)})
     items.sort(key=lambda item: (item["p"], item.get("rank", 3), -item.get("profit", 0)))
 
-    messages_left = status["minutes_remaining_today"] // status["minutes_per_exchange"]
+    messages_left = max(0, status["minutes_remaining_today"] // status["minutes_per_exchange"] - used)
     if not uncontacted:
         goal = "done"
     elif today <= target:
@@ -527,16 +556,12 @@ def _build_queue(ctx):
     else:
         goal = "target day passed: contact as many as the minutes allow"
     later.sort()
-    tomorrow = [cid for day, cid in later if day == today + 1]
-    reminder = (f" Tomorrow start with work_queue: {len(tomorrow)} accounts are due ({', '.join(tomorrow[:8])})."
-                if tomorrow and today < last_day else "")
     if messages_left == 0:
-        do_next = "No contact minutes left (messages_left_today 0): end the day with one line saying so." + reminder
+        do_next = "No messages left today: end the day in one line."
     elif items:
         do_next = items[0]["do"]
     else:
-        do_next = (f"Every account is handled for today ({messages_left} messages unused): end the day with one "
-                   "line saying so." + reminder)
+        do_next = "Every account is handled for today: end the day in one line."
     return {"day": today, "of": last_day, "messages_left_today": messages_left,
             "first_contacts_left": len(uncontacted), "first_contacts_goal": goal,
             "items": items, "later": [f"{cid} day {day}" for day, cid in later],
@@ -551,21 +576,39 @@ def _same_question(a, b):
     return bool(a and b) and set(_tokens(a)) == set(_tokens(b))
 
 
-def _quotes_for(ctx, question, repeat=False):
+def _answer_docs(ctx, question, repeat=False):
     """The documents answering a question, in full, to be quoted word for word. Company documents are
     short, and a whole document keeps facts that sentence picking drops (Driftwood's support hours).
     After a repeated question the answer widens to the next-best documents."""
     ranked = [(s, d) for s, d in _search_docs(ctx, question, exclude=NOT_ANSWERS)[:3] if s >= 0.1]
     if not ranked:
-        return "(no document matched: use find_docs)"
+        return []
     best = ranked[0][0]
-    chosen = [d for s, d in ranked if s >= best * (QUOTE_WIDE if repeat else QUOTE_CLOSE)]
-    return " ".join(f"\"{d['text']}\" [{d['id']}]" for d in chosen)
+    return [d for s, d in ranked if s >= best * (QUOTE_WIDE if repeat else QUOTE_CLOSE)]
 
 
-def _answer_for(ctx, question, lead):
-    """The quoting instruction for an open question; a repeat gets more documents and find_docs."""
+def _quotes_for(ctx, question, repeat=False):
+    docs = _answer_docs(ctx, question, repeat)
+    if not docs:
+        return "(no document matched: use find_docs)"
+    return " ".join(f"\"{d['text']}\" [{d['id']}]" for d in docs)
+
+
+def _tool_quotes(question, lead):
+    """True when the offer tool itself puts the answer documents first (any first-time question).
+    A repeated question goes back to the model, which reads the documents and answers every part."""
+    return bool(question) and not _same_question(question, (lead or {}).get("last_answered", ""))
+
+
+def _answer_for(ctx, question, lead, by_offer=False):
+    """The quoting instruction for an open question; a repeat gets more documents and find_docs.
+    by_offer: the offer tool inserts the document text itself, so the text stays out of the history."""
     repeat = _same_question(question, (lead or {}).get("last_answered", ""))
+    if by_offer and not repeat:
+        ids = [d["id"] for d in _answer_docs(ctx, question)]
+        if ids:
+            return (f"the documents {ids}: the offer tool puts their exact text at the start of your "
+                    "message, so do not retype or paraphrase them.")
     text = f"quoting these documents word for word: {_quotes_for(ctx, question, repeat)}"
     if repeat:
         text += (" They asked this again, so the last answer missed what they need: call find_docs with "
@@ -583,11 +626,9 @@ def _offer_instruction(ctx, customer_id, assessment, question, reuse, lead=None)
         return (_persuade_instruction(ctx, customer_id, pitch, lead)
                 + " Ask them to tell you if their budget or requirements have changed.")
     if question:
-        return (f"{call} Message: first answer \"{question[:120]}\" by {_answer_for(ctx, question, lead)} "
-                "Then ask whether their needs or budget have "
-                "changed. Then state the plan and price.")
-    return (f"{call} Message: state the plan, price and how it covers what they said they need, "
-            "and invite them to say if anything changed. No small talk.")
+        return (f"{call} First answer \"{question[:120]}\" by {_answer_for(ctx, question, lead, by_offer=True)} "
+                "Then ask if needs or budget changed, then plan and price.")
+    return call
 
 
 def _answer_instruction(ctx, customer_id, question):
@@ -603,7 +644,8 @@ def _persuade_instruction(ctx, customer_id, pitch, lead):
     risk_line = f" Lower the risk by quoting: \"{risk[0][1]}\"" if risk else ""
     reasons = ", ".join(lead.get("needs", []) + lead.get("nice_to_haves", [])) or "their stated needs"
     question = lead.get("open_question", "")
-    answer = (f" First answer \"{question[:100]}\" by {_answer_for(ctx, question, lead)}" if question else "")
+    answer = (f" First answer \"{question[:100]}\" by {_answer_for(ctx, question, lead, by_offer=True)}"
+              if question else "")
     return (f"offer {customer_id} (product_id='{pitch['plan']}', price_cents={pitch['price_cents']}). "
             f"Message:{answer} Persuade briefly: the plan solves {reasons}; this is the lowest price the policy "
             f"allows.{risk_line} Ask whether their budget or requirements have changed. One short, honest "
@@ -743,38 +785,52 @@ def _first_message(ctx, customer_id, catalog):
     return message, sorted(used)
 
 
+def _question_hint(reply):
+    """A reply with a question: remind the model to record it, since the offer answers it from the
+    documents (a separate find_docs lookup only adds text to the history)."""
+    asks = re.search(r"\?|\b(explain|whether|clarify|confirm|tell us|let us know|how (do|does|can|long|much|many)"
+                     r"|what|which|when|where|is there|are there|can (you|we)|do you)\b", (reply or "").lower())
+    return " Put their question in open_question: the next offer quotes the answer (no find_docs)." if asks else ""
+
+
 def _send_first_contact(ctx, customer_id, catalog, status):
     """Compose and send a first contact; the send is the last operation."""
     message, sources = _first_message(ctx, customer_id, catalog)
-    business = ctx.read_customer(customer_id=customer_id)["customer"]["business"]
     _touch(ctx, customer_id, status["day"])
     plan = ctx.state.get("first_contact_plan")
     if plan and plan.get("day") == status["day"]:
         plan["sent"] += 1                      # counts against today's first-contact quota
     messages_left = status["minutes_remaining_today"] // status["minutes_per_exchange"] - 1
     result = ctx.talk_to_customer(customer_id=customer_id, message=message)
-    out = {"first_contact_sent_to": f"{customer_id} ({business})",
-           "sent": "plans, discovery questions" + (f", answers from {', '.join(sources)}" if sources else ""),
-           "reply": result["reply"]["text"], "decision": result["decision"],
-           "messages_left_today": messages_left}
+    out = {"sent": f"first contact {customer_id}", "reply": result["reply"]["text"],
+           "decision": result["decision"], "left": messages_left}
     if result["decision"] == "opt_out":
         ctx.state.setdefault("leads", {})[customer_id] = {"dropped": True}
-        out["do_next"] = "They opted out; never contact them again. Call work_queue for the next task."
-    elif result["decision"] == "end_call":
-        out["do_next"] = f"record_lead for {customer_id} with what they said, then continue"
+        out["do_next"] = "Opted out: never contact again. work_queue"
     else:
-        out["do_next"] = f"record_lead for {customer_id} from this reply"
+        out["do_next"] = f"record_lead {customer_id}." + _question_hint(result["reply"]["text"])
     return out
 
 
 # --------------------------------------------------------------------------- planning tools
 
+def _send_item(ctx, item, messages_left):
+    """Send the next task when a tool can do it alone: a first contact, or a routine offer written by
+    the tool. Returns the result (the send is the last operation), or None when the model must act."""
+    if not item or messages_left <= 0:
+        return None
+    if item["kind"] == "first":
+        return _send_first_contact(ctx, item["cid"], ctx.get_catalog(), ctx.get_status())
+    if item.get("auto"):
+        out = _present_offer(ctx, item["cid"], item["plan"], item["price_cents"], None, kind=item["kind"])
+        if "error" not in out:
+            return out
+    return None
+
+
 @tool
 def campaign_brief(ctx) -> dict:
-    """Start of day 1 (and whenever pricing may have changed): today's day and minutes,
-    each plan's features, integrations, list price and lowest legal price today, how long
-    a quote presented today stays valid, registered future price changes, and the full
-    text of company documents announcing pricing changes. New documents are flagged."""
+    """Call on day 1: plans, today's pricing, and documents announcing price changes."""
     status, catalog = ctx.get_status(), ctx.get_catalog()
     policy = catalog["current_pricing_policy"]
     plans = [{"id": p["id"], "features": p["features"], "integrations": p["integrations"],
@@ -811,9 +867,8 @@ def campaign_brief(ctx) -> dict:
 
 @tool
 def register_price_change(ctx, effective_day: int, max_discount_percent: int, quote_valid_days: int) -> dict:
-    """Record a future pricing policy announced in a company document (from campaign_brief),
-    so lead plans can lock prices before it starts. Example: standard pricing from day 7 with
-    5% maximum discount and quotes valid 2 days -> (7, 5, 2). Call once per announced change."""
+    """Record an announced future pricing policy, e.g. from day 7, 5% off, quotes valid 2 days
+    -> (7, 5, 2). Once per change."""
     changes = [c for c in ctx.state.get("price_changes", []) if c["effective_day"] != effective_day]
     changes.append({"effective_day": effective_day, "discount": max_discount_percent, "valid": quote_valid_days})
     ctx.state["price_changes"] = sorted(changes, key=lambda c: c["effective_day"])
@@ -822,82 +877,15 @@ def register_price_change(ctx, effective_day: int, max_discount_percent: int, qu
 
 @tool
 def work_queue(ctx) -> dict:
-    """The day's tasks in priority order: replies to record, time-critical work (callbacks,
-    decision-day offers, price locks), then first contacts to accounts never reached. If the
-    next task is a first contact, this tool SENDS it (one message) and returns the reply:
-    then record it with record_lead. Call at the start of every day and whenever unsure.
-    Always follow do_next."""
+    """Start of every day: the next task (do_next). Sends a first contact or routine offer itself."""
     queue = _build_queue(ctx)
-    result = {"day": queue["day"], "of": queue["of"], "messages_left_today": queue["messages_left_today"],
-              "first_contacts": f"{queue['first_contacts_left']} left; {queue['first_contacts_goal']}",
-              "sold": queue["sold"], "todo": [item["text"] for item in queue["items"][:15]]}
-    if len(queue["items"]) > 15:
-        result["more_todo"] = len(queue["items"]) - 15
-    if queue["later"]:
-        result["later"] = queue["later"][:20]
+    result = {"left": queue["messages_left_today"]}
     top = queue["items"][0] if queue["items"] else None
-    if top and top["kind"] == "first" and queue["messages_left_today"] > 0:
-        status, catalog = ctx.get_status(), ctx.get_catalog()
-        result.update(_send_first_contact(ctx, top["cid"], catalog, status))
+    sent = _send_item(ctx, top, queue["messages_left_today"])
+    if sent:
+        result.update(sent)
         return result
     result["do_next"] = queue["do_next"]
-    return result
-
-
-@tool
-def check_time(ctx) -> dict:
-    """Contact time left today, read from the campaign itself (minutes per day and per message
-    vary between campaigns). Call it BEFORE ending any day: it says whether you may end the day."""
-    status = ctx.get_status()
-    messages_left = status["minutes_remaining_today"] // status["minutes_per_exchange"]
-    result = {"day": status["day"], "of": status["campaign_days"],
-              "minutes_remaining_today": status["minutes_remaining_today"],
-              "minutes_per_message": status["minutes_per_exchange"], "messages_left_today": messages_left}
-    if messages_left == 0:
-        result["may_end_day"] = True
-        result["do_next"] = "End the day: no contact time left. Reply 'Ending day N: no contact minutes left.'"
-        return result
-    queue = _build_queue(ctx)
-    if not queue["items"]:
-        result["may_end_day"] = True
-        result["do_next"] = queue["do_next"]
-    else:
-        result["may_end_day"] = False
-        result["tasks_waiting"] = len(queue["items"])
-        result["do_next"] = f"Do NOT end the day: {messages_left} messages left. Next: {queue['items'][0]['do']}"
-    return result
-
-
-@tool
-def read_account(ctx, customer_id: str) -> dict:
-    """One account in detail, when you need it: CRM background and dated past interactions,
-    this campaign's conversation, quotes with validity, pending callbacks, what you recorded
-    with record_lead, and the recommended plan, price and day."""
-    history = ctx.read_customer_history(customer_id=customer_id)
-    status = ctx.get_status()
-    today = status["day"]
-    crm = []
-    for record in history["record_index"]:
-        if record["kind"] in ("interaction", "sale", "refund", "cancellation"):
-            data = ctx.read_record(record_id=record["id"])["data"]
-            texts = [m["text"] for m in data.get("messages", [])] or [str(data)[:200]]
-            crm.append(f"{record['date']} {record['kind']}: " + " / ".join(texts))
-    conversation = []
-    for message in history["history"]:
-        who = "you" if message["role"] == "salesperson" else f"customer[{message['decision']}]"
-        text = message["text"] if message["role"] != "salesperson" else message["text"][:140]
-        quote = f" (quote {message['quote_id']})" if message["quote_id"] else ""
-        conversation.append(f"day {message['day']} {who}{quote}: {text}")
-    result = {"customer": history["customer"]["name"], "business": history["customer"]["business"],
-              "status": history["status"], "contact": history["contact"],
-              "crm_background": history["customer"].get("background"),
-              "crm_history": crm, "conversation": conversation,
-              "quotes": [_quote_view(q, today, history["orders"]) for q in history["quotes"]],
-              "pending_callbacks": [{"day": cb["day"], "reason": cb["reason"]} for cb in history["pending_callbacks"]]}
-    lead = ctx.state.get("leads", {}).get(customer_id)
-    if lead and lead.get("needs") is not None:
-        result["recorded"] = {k: v for k, v in lead.items() if k != "dropped"}
-        result["recommendation"] = _summary(_assess_customer(ctx, customer_id, status=status, account=history))
     return result
 
 
@@ -906,35 +894,13 @@ def record_lead(ctx, customer_id: str, needs: list[str], nice_to_haves: list[str
                 budget_cents: int | None, max_budget_cents: int | None, ready_day: int | None,
                 scope_final: bool, pending_features: list[str], open_question: str, unsellable_reason: str,
                 notes: str) -> dict:
-    """Save what a customer told you -- call it after EVERY customer reply. Returns the
-    recommended plan, price and day, and do_next. When the next task is a first contact,
-    this tool also SENDS it (one message) and returns that new customer's reply: record
-    that reply with record_lead too. Latest information replaces older.
-    needs: must-have features using catalog feature ids (e.g. scheduling, reminders,
-      location_reporting). Put a must-have no plan offers here too.
-    nice_to_haves: catalog feature ids they would value but do not require (e.g. "reducing
-      confirmation chasing" -> reminders; "seeing sites side by side" -> location_reporting).
-    integrations: must-have live integrations by catalog name (e.g. BookFlow, CalendarLink).
-    budget_cents: what they would willingly spend per month for the must-haves, in cents.
-      null if they gave no number -- never guess or use a list price (null keeps the old one).
-      A NEW budget the customer states (funding approved, limit changed) replaces the old one.
-    max_budget_cents: their approved monthly limit if they state one (it can be higher than the
-      willingly-spend amount, e.g. "before optional features"); null if not stated.
-    ready_day: earliest campaign day they can approve a purchase; null if they can approve now.
-      If they can only approve after the campaign's last day (e.g. "next month", "next term"
-      beyond the last day), give that later day number: the account is abandoned at once.
-    scope_final: false if needs or budget depend on a pending meeting, review, funding or
-      software decision.
-    pending_features: catalog feature ids the pending decision could ADD to their must-haves,
-      judged from what they said (e.g. "a review will decide whether we need site reporting"
-      -> location_reporting). [] if none, if scope_final is true, or if they said they do not
-      want it.
-    open_question: the customer's question you have not answered yet, word for word; "" if none.
-      The next offer answers it first (quoting document sentences), then gives the plan and price.
-    unsellable_reason: non-empty only when a must-have is confirmed unavailable (check
-      find_docs: a document may describe a workaround) and no pending decision could change
-      it. While scope_final is false the account is revisited on its decision day instead.
-    notes: short facts worth remembering (decision process, concerns)."""
+    """After EVERY customer reply; the latest replaces older. Returns plan and do_next; may send
+    the next message. needs / nice_to_haves: feature ids (needs also ones no plan has).
+    integrations: required ones. budget_cents: willing monthly spend, null if unstated.
+    max_budget_cents: stated approved limit or null. ready_day: earliest approval day, null if
+    now. scope_final: false if a pending decision may change needs or budget; pending_features:
+    features it could add. open_question: their unanswered question or "". unsellable_reason:
+    only if a must-have is confirmed unavailable. notes: usually ""."""
     leads = ctx.state.setdefault("leads", {})
     previous = leads.get(customer_id, {})
     new_budget = budget_cents if budget_cents is not None else previous.get("budget_cents")
@@ -942,6 +908,8 @@ def record_lead(ctx, customer_id: str, needs: list[str], nice_to_haves: list[str
     learned = set(previous.get("plan_caps", {}).values())
     budget_changed = ((new_budget, new_upper) != (previous.get("budget_cents"), previous.get("max_budget_cents"))
                       and new_budget not in learned)   # copying an offer's "at most $X" is not a new budget
+    scope_changed = (sorted(_lower(needs)) != sorted(_lower(previous.get("needs") or []))
+                     or sorted(_lower(integrations)) != sorted(_lower(previous.get("integrations") or [])))
     lead = {"needs": needs, "nice_to_haves": nice_to_haves, "integrations": integrations,
             "budget_cents": new_budget, "max_budget_cents": new_upper,
             "ready_day": ready_day, "scope_final": scope_final, "open_question": open_question.strip(),
@@ -952,16 +920,21 @@ def record_lead(ctx, customer_id: str, needs: list[str], nice_to_haves: list[str
             # Prices learned from offer replies, and the one-time final offer, hold until the budget changes.
             "plan_caps": {} if budget_changed else previous.get("plan_caps", {}),
             "best_price_offered": False if budget_changed else previous.get("best_price_offered", False),
-            "declined_quotes": [] if budget_changed else previous.get("declined_quotes", []),
+            "declined_quotes": [] if budget_changed or scope_changed else previous.get("declined_quotes", []),
             "persuasions": previous.get("persuasions", 0), "last_persuade_day": previous.get("last_persuade_day")}
     leads[customer_id] = lead
     assessment = _assess_customer(ctx, customer_id)
     if assessment and assessment["kind"] == "closed":
         lead["dropped"] = True
         lead["close"] = assessment.get("close", "budget")   # window / capability: never again; budget: persuade later
-    out = {"saved": customer_id, "recommendation": _summary(assessment)}
+    out = {"plan": _summary(assessment)}
+    if assessment and _declined_again(lead, ctx.read_customer(customer_id=customer_id)["quotes"],
+                                      assessment.get("plan"), assessment.get("price_cents")):
+        out["note"] = (f"They already declined {assessment['plan']} at {assessment['price']} and nothing recorded "
+                       "changed, so no new offer. Re-read their reply: a feature they say the plan lacks is a "
+                       "must-have (needs); a price they name is their budget. Record that with record_lead.")
     if assessment and assessment.get("close") == "window":
-        out["abandoned"] = "they cannot approve within the campaign; no further contact"
+        out["plan"] = "closed: cannot approve within the campaign"
 
     # A customer who can only decide later gets a callback on that day, so it is never missed.
     today = ctx.get_status()["day"]
@@ -971,34 +944,31 @@ def record_lead(ctx, customer_id: str, needs: list[str], nice_to_haves: list[str
             booked = ctx.call("schedule_callback", customer_id=customer_id, day=ready_day,
                               reason=f"Customer can decide from day {ready_day}: confirm needs and offer.")
             if booked["ok"]:
-                out["callback_booked"] = f"day {ready_day}"
+                out["callback"] = f"day {ready_day}"
 
     queue = _build_queue(ctx)
     own = [item for item in queue["items"] if item["cid"] == customer_id and item["p"] <= 1]
-    out["messages_left_today"] = queue["messages_left_today"]
-    out["first_contacts_left"] = queue["first_contacts_left"]
-    if own and queue["messages_left_today"] > 0:
-        out["do_next"] = own[0]["do"]           # this customer can buy or decide now: finish with them first
+    out["left"] = queue["messages_left_today"]
+    # This customer first when they can buy or decide now; otherwise the next task in the queue.
+    nxt = own[0] if own and queue["messages_left_today"] > 0 else (queue["items"][0] if queue["items"] else None)
+    sent = _send_item(ctx, nxt, queue["messages_left_today"])   # chain: a first contact or a routine offer
+    if sent:
+        out.update(sent)
         return out
-    top = queue["items"][0] if queue["items"] else None
-    if top and top["kind"] == "first" and queue["messages_left_today"] > 0:
-        status, catalog = ctx.get_status(), ctx.get_catalog()
-        out.update(_send_first_contact(ctx, top["cid"], catalog, status))   # chain to the next new account
-        return out
-    out["do_next"] = queue["do_next"]
+    out["do_next"] = nxt["do"] if nxt and queue["messages_left_today"] > 0 else queue["do_next"]
     return out
 
 
 @tool
 def find_docs(ctx, question: str) -> list:
-    """Company documents that answer a question (cosine similarity, best first, up to 3, full
-    text with id), plus key_sentences: the exact sentences that answer it -- quote those word
-    for word. Use before answering any customer question about features, integrations,
-    migration, data, security, support, billing, trial or cancellation. Archived documents
-    are outdated and ranked last."""
-    docs = [{"id": d["id"], "title": d["title"], "text": d["text"]} for _, d in _search_docs(ctx, question)[:3]]
-    sentences = [f"{sentence} [{doc_id}]" for doc_id, sentence in _key_sentences(ctx, question)]
-    return docs + [{"key_sentences": sentences}]
+    """Company documents for a question (best first, full text). Use ONLY to check a missing
+    must-have before closing an account, for a repeated question, when do_next says no document
+    matched, or for a message you write yourself. Customer questions are answered by the offer
+    automatically: record them in open_question instead of looking them up."""
+    ranked = _search_docs(ctx, question)[:3]
+    best = ranked[0][0] if ranked else 0
+    # Only documents close to the best match: each result is re-read on every later call.
+    return [{"id": d["id"], "text": d["text"]} for s, d in ranked if s >= best * 0.5]
 
 
 # --------------------------------------------------------------------------- contact tools
@@ -1013,23 +983,8 @@ def _contact_check(ctx, customer_id):
 
 
 @tool
-def first_contact(ctx, customer_id: str) -> dict:
-    """Send the first message to an account never contacted (one message): the plans from
-    the catalog, answers from company documents to the concern in its CRM record, and the
-    discovery questions (must-haves, budget, earliest approval day, whether needs are final).
-    work_queue and record_lead usually send first contacts for you."""
-    account, problem = _contact_check(ctx, customer_id)
-    if problem:
-        return problem
-    return _send_first_contact(ctx, customer_id, ctx.get_catalog(), ctx.get_status())
-
-
-@tool
 def send_message(ctx, customer_id: str, message: str) -> dict:
-    """Send one message (5 minutes, $0.50) and get the reply. Use to re-ask needs and budget
-    on a decision day, or to follow up a callback. Ask everything in ONE message. Do NOT use
-    it to answer a question when an offer is due: put the answer inside the offer message.
-    Refuses accounts that already bought or opted out."""
+    """Send one message and get the reply. Only when do_next says send_message."""
     account, problem = _contact_check(ctx, customer_id)
     if problem:
         return problem
@@ -1044,21 +999,31 @@ def send_message(ctx, customer_id: str, message: str) -> dict:
     if result["decision"] == "opt_out":
         ctx.state.setdefault("leads", {})[customer_id] = {"dropped": True}
     output = {"reply": result["reply"]["text"], "decision": result["decision"],
-              "messages_left_today": status["minutes_remaining_today"] // status["minutes_per_exchange"] - 1,
-              "do_next": f"record_lead for {customer_id} from this reply"}
+              "left": status["minutes_remaining_today"] // status["minutes_per_exchange"] - 1,
+              "do_next": f"record_lead {customer_id}." + _question_hint(result["reply"]["text"])}
     if has_valid_quote and result["decision"] == "continue":
-        output["reminder"] = "This customer has a valid quote: re-present it with offer, answering any question inside it."
+        output["reminder"] = "Valid quote: re-present it with offer."
     return output
 
 
-@tool
-def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str) -> dict:
-    """Make a formal offer (5 minutes, $0.50) and get the decision; only an accepted offer
-    becomes an order. Re-presents an already-issued, still-valid quote for the same plan at
-    or below this price (keeping its locked terms); otherwise creates a new quote. A price
-    above list is lowered to list; a price below today's legal minimum is refused with the
-    legal range. Say in the message how the plan meets what the customer told you, and answer
-    any question the customer has asked (from find_docs) in the same message."""
+def _auto_message(lead, product, price_cents, expires, kind):
+    """A routine offer written by the tool: the plan, how it covers the customer's must-haves, the
+    price and its validity, and an invitation to say if anything changed (no model call needed)."""
+    needs = [f.replace("_", " ") for f in (lead or {}).get("needs", []) if f in product["features"]]
+    integrations = [i for i in (lead or {}).get("integrations", []) if i in product["integrations"]]
+    def listed(words):
+        return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " and " + words[-1]
+    covers = f" covers the {listed(needs)} you need" if needs else " fits what you told me"
+    works = f" and works with {listed(integrations)}" if integrations else ""
+    held = (f" This price is held for you through day {expires}, before prices rise." if kind == "lock"
+            else f" The offer is valid through day {expires}.")
+    return (f"{product['name']}{covers}{works}. It is {_money(price_cents)} per month.{held} "
+            "If anything has changed in your needs or budget, please tell me.")
+
+
+def _present_offer(ctx, customer_id, product_id, price_cents, message, kind=None):
+    """Validate, quote and present one offer; the send is the last operation. message None: the tool
+    writes a routine offer itself. The next task after a sale is worked out BEFORE the send."""
     account, problem = _contact_check(ctx, customer_id)
     if problem:
         return problem
@@ -1066,7 +1031,7 @@ def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str
     if not recorded or not recorded.get("needs"):
         # No discovery yet: an offer would guess the plan (Copper Bicycle needed OtherSuite).
         return {"error": f"No needs recorded for {customer_id}: discover them before offering.",
-                "do_next": (f"first_contact {customer_id}" if account["contact"]["last_contact_day"] is None
+                "do_next": ("work_queue" if account["contact"]["last_contact_day"] is None
                             else f"record_lead for {customer_id} from their last reply")}
     status, catalog = ctx.get_status(), ctx.get_catalog()
     today = status["day"]
@@ -1095,6 +1060,16 @@ def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str
         expires = today + policy["quote_valid_days"]
     _touch(ctx, customer_id, today)
     lead = ctx.state.get("leads", {}).get(customer_id)
+    written_by_tool = message is None
+    if written_by_tool:
+        message = _auto_message(lead, product, quote["monthly_price_cents"], expires, kind)
+    # An open question is answered by the documents' exact text, put first by the tool (the model
+    # writes only the plan and price), so the document text never enters the conversation history.
+    question = (lead or {}).get("open_question", "")
+    if _tool_quotes(question, lead):
+        docs = [d for d in _answer_docs(ctx, question) if d["text"][:80] not in message]
+        if docs:
+            message = " ".join(f"\"{d['text']}\" [{d['id']}]" for d in docs) + " " + message.strip()
     if lead is not None and lead.get("needs") is not None:
         if lead.get("open_question"):
             lead["last_answered"] = lead["open_question"]
@@ -1106,7 +1081,15 @@ def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str
                              lead.get("max_budget_cents")) if c is not None]
         if known and quote["monthly_price_cents"] > max(known):
             lead["best_price_offered"] = True  # offered above everything they said they would pay
-    result = ctx.present_quote(quote_id=quote["id"], message=message)
+    # 1b: the next task if they buy, worked out now (no reads are allowed after the send): the queue
+    # without this customer and with this message used. Anything a tool sends itself goes via work_queue.
+    after = _build_queue(ctx, skip=customer_id, used=1)
+    top = after["items"][0] if after["items"] else None
+    if after["messages_left_today"] > 0 and top and (top["kind"] == "first" or top.get("auto")):
+        next_if_bought = "work_queue"
+    else:
+        next_if_bought = after["do_next"]
+    result = ctx.present_quote(quote_id=quote["id"], message=message)   # the send: nothing after it but local code
     # "For this offer, I would pay at most $X": remember it as this plan's price cap.
     reply_text = result["reply"]["text"] if result.get("reply") else ""
     at_most = re.search(r"at most \$([0-9][0-9,]*(?:\.[0-9]{2})?)", reply_text)
@@ -1120,30 +1103,40 @@ def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str
         declined = lead.setdefault("declined_quotes", [])
         if quote["id"] not in declined:
             declined.append(quote["id"])       # never re-present it unless their budget or scope changes
-    output = {"quote": quote["id"], "plan": product_id, "price": _money(quote["monthly_price_cents"]),
-              "valid_through_day": expires, "decision": result["decision"],
+    output = {}
+    if written_by_tool:
+        output["sent"] = f"offer {customer_id}: {product_id} {_money(quote['monthly_price_cents'])} to day {expires}"
+    output.update({"decision": result["decision"],
               "reply": result["reply"]["text"] if result.get("reply") else None,
-              "messages_left_today": status["minutes_remaining_today"] // status["minutes_per_exchange"] - 1}
+              "left": status["minutes_remaining_today"] // status["minutes_per_exchange"] - 1})
     if result.get("order"):
-        output["order"] = "ACCEPTED - do not contact this customer again"
-        output["do_next"] = "work_queue (it continues with the next account)"
+        output["order"] = "ACCEPTED: never contact again"
+        output["do_next"] = next_if_bought
+    elif result["decision"] == "opt_out":
+        ctx.state.setdefault("leads", {})[customer_id] = {"dropped": True}
+        output["do_next"] = "Opted out: never contact again. work_queue"
     else:
-        if at_most:
-            output["price_cap_saved"] = f"{product_id}: {at_most.group(0)}"
-        output["do_next"] = (f"record_lead for {customer_id}: put any question in open_question and any new "
-                             "needs or approval day; it then gives the next offer")
+        missing = _lacks(product, catalog)
+        lacking = (f" A feature they say {product_id} lacks ({', '.join(missing)}) goes in needs."
+                   if missing else "")
+        output["do_next"] = (f"record_lead {customer_id}: update what changed.{lacking} "
+                             "A price they name is their budget." + _question_hint(reply_text))
     return output
+
+
+
+
+@tool
+def offer(ctx, customer_id: str, product_id: str, price_cents: int, message: str) -> dict:
+    """Present a formal offer (one message) and get the decision. Use the product_id and
+    price_cents do_next gives; reuses a valid quote; refuses illegal prices. If the customer
+    has an open question, the tool puts the answering documents' exact text first: write only
+    the rest of the message. Routine offers are sent for you by record_lead and work_queue."""
+    return _present_offer(ctx, customer_id, product_id, price_cents, message)
 
 
 @tool
 def schedule_callback(ctx, customer_id: str, day: int, reason: str) -> dict:
-    """Book a follow-up when you promise one or the customer asks you to come back on a
-    day. work_queue shows it on that day; contacting the customer that day completes it."""
+    """Book a follow-up on a day you promised (decision-day callbacks are booked for you)."""
     callback = ctx.schedule_callback(customer_id=customer_id, day=day, reason=reason)
     return {"booked": callback["id"], "day": callback["day"], "do_next": "work_queue"}
-
-
-@tool
-def read_document(ctx, document_id: str) -> dict:
-    """Read one company document by id (ids come from find_docs or campaign_brief)."""
-    return ctx.read_document(document_id=document_id)
